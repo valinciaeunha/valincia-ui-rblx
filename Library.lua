@@ -698,6 +698,81 @@ function Tab:AddRightTabbox(title) return self:AddTabbox(title) end
 --------------------------------------------------------------------------------
 -- Element: Viewport
 --------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-- Element: Video
+--------------------------------------------------------------------------------
+-- Element: Image
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Groupbox
+--------------------------------------------------------------------------------
+Groupbox = {}
+Groupbox.__index = Groupbox
+
+function Groupbox.new(contentFrame, title, library)
+    local self = setmetatable({}, Groupbox)
+    self._library = library
+
+    local box = Instance.new("Frame")
+    box.Name = "Groupbox"
+    box.Size = UDim2.new(1, 0, 0, 0)
+    box.AutomaticSize = Enum.AutomaticSize.Y
+    box.BackgroundColor3 = Color3.fromRGB(24, 24, 24)
+    box.BorderSizePixel = 0
+    box.Parent = contentFrame
+
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 4)
+    local stroke = Instance.new("UIStroke", box)
+    stroke.Color = Color3.fromRGB(50, 50, 50)
+    stroke.Thickness = 1
+
+    local header = Instance.new("TextLabel")
+    header.Name = "Title"
+    header.Size = UDim2.new(1, -20, 0, 20)
+    header.Position = UDim2.new(0, 10, 0, 2)
+    header.BackgroundTransparency = 1
+    header.Text = title
+    header.TextColor3 = Color3.fromRGB(255, 255, 255)
+    header.TextSize = 13
+    header.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.SemiBold)
+    header.TextXAlignment = Enum.TextXAlignment.Left
+    header.Parent = box
+
+    -- Content container
+    local content = Instance.new("Frame")
+    content.Name = "Content"
+    content.Size = UDim2.new(1, -20, 0, 0)
+    content.Position = UDim2.new(0, 10, 0, 26) -- Below title
+    content.AutomaticSize = Enum.AutomaticSize.Y
+    content.BackgroundTransparency = 1
+    content.Parent = box
+
+    local layout = Instance.new("UIListLayout")
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 6)
+    layout.Parent = content
+
+    local padding = Instance.new("UIPadding")
+    padding.PaddingBottom = UDim.new(0, 10)
+    padding.Parent = content
+
+    self._box = box
+    self._content = content
+    self._order = 0
+
+    return self
+end
+
+function Groupbox:_nextOrder()
+    self._order = self._order + 1
+    return self._order
+end
+
+--------------------------------------------------------------------------------
+-- Element: Viewport
+--------------------------------------------------------------------------------
 function Groupbox:AddViewport(config)
     config = config or {}
     local model = config.Model
@@ -800,81 +875,6 @@ function Groupbox:AddImage(config)
     image.Parent = container
 
     return image
-end
-
---------------------------------------------------------------------------------
--- Groupbox
---------------------------------------------------------------------------------
-Groupbox = {}
-Groupbox.__index = Groupbox
-
-function Groupbox.new(parent, title, library)
-    local self = setmetatable({}, Groupbox)
-    self._library = library
-    self._title = title
-
-    local container = Instance.new("Frame")
-    container.Name = "Groupbox_" .. (title or "")
-    container.Size = UDim2.new(1, 0, 0, 0)
-    container.AutomaticSize = Enum.AutomaticSize.Y
-    container.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    container.BorderSizePixel = 0
-    container.Parent = parent
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = container
-
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(45, 45, 45)
-    stroke.Thickness = 1
-    stroke.Parent = container
-
-    -- Title
-    if title then
-        local titleLabel = Instance.new("TextLabel")
-        titleLabel.Name = "Title"
-        titleLabel.Size = UDim2.new(1, -16, 0, 22)
-        titleLabel.Position = UDim2.new(0, 8, 0, 4)
-        titleLabel.BackgroundTransparency = 1
-        titleLabel.Text = title
-        titleLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-        titleLabel.TextSize = 12
-        titleLabel.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.SemiBold)
-        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
-        titleLabel.LayoutOrder = 0
-        titleLabel.Parent = container
-    end
-
-    -- Content within groupbox
-    local content = Instance.new("Frame")
-    content.Name = "Content"
-    content.Size = UDim2.new(1, -16, 0, 0)
-    content.Position = UDim2.new(0, 8, 0, title and 28 or 8)
-    content.AutomaticSize = Enum.AutomaticSize.Y
-    content.BackgroundTransparency = 1
-    content.Parent = container
-
-    local layout = Instance.new("UIListLayout")
-    layout.FillDirection = Enum.FillDirection.Vertical
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 5)
-    layout.Parent = content
-
-    local bottomPad = Instance.new("UIPadding")
-    bottomPad.PaddingBottom = UDim.new(0, 8)
-    bottomPad.Parent = content
-
-    self._container = container
-    self._content = content
-    self._elementCount = 0
-
-    return self
-end
-
-function Groupbox:_nextOrder()
-    self._elementCount = self._elementCount + 1
-    return self._elementCount
 end
 
 --------------------------------------------------------------------------------
