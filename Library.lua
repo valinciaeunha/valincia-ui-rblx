@@ -337,8 +337,9 @@ function Library:CreateWindow(config)
     minBtn.Size = UDim2.new(0, 36, 1, 0)
     minBtn.Position = UDim2.new(1, -72, 0, 0)
     minBtn.BackgroundTransparency = 1
-    minBtn.Image = "rbxassetid://6035047409" -- Material Remove (Minus)
+    minBtn.Image = "rbxassetid://8422725545" -- Lucide-like Minus
     minBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    minBtn.ZIndex = 11
     minBtn.Parent = titleBar
 
     self:Connect(minBtn.MouseEnter, function() minBtn.ImageColor3 = Color3.fromRGB(200, 200, 200) end)
@@ -350,8 +351,9 @@ function Library:CreateWindow(config)
     closeBtn.Size = UDim2.new(0, 36, 1, 0)
     closeBtn.Position = UDim2.new(1, -36, 0, 0)
     closeBtn.BackgroundTransparency = 1
-    closeBtn.Image = "rbxassetid://6031094670" -- Material Close (X)
+    closeBtn.Image = "rbxassetid://8422725962" -- Lucide-like X
     closeBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    closeBtn.ZIndex = 11
     closeBtn.Parent = titleBar
 
     self:Connect(closeBtn.MouseEnter, function() closeBtn.ImageColor3 = Color3.fromRGB(255, 100, 100) end)
