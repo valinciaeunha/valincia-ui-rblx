@@ -1141,14 +1141,22 @@ function Groupbox:AddDropdown(flag, config)
         local v = dropdown.Value
         if multi then
             if type(v) == "table" and #v > 0 then 
-                mainBtn.Text = table.concat(v, ", ") 
+                local str = table.concat(v, ", ")
+                if #str > 40 then
+                    str = string.sub(str, 1, 40) .. "..."
+                end
+                mainBtn.Text = str
                 mainBtn.TextColor3 = Color3.fromRGB(240, 240, 240)
             else 
                 mainBtn.Text = "None"
                 mainBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
             end
         else
-            mainBtn.Text = v and tostring(v) or "Select..."
+            local str = v and tostring(v) or "Select..."
+            if #str > 40 then
+                str = string.sub(str, 1, 40) .. "..."
+            end
+            mainBtn.Text = str
             mainBtn.TextColor3 = v and Color3.fromRGB(240, 240, 240) or Color3.fromRGB(180, 180, 180)
         end
     end
