@@ -468,7 +468,7 @@ function Library:CreateWindow(config)
 
     local openIcon = Instance.new("ImageLabel")
     openIcon.Name = "Icon"
-    openIcon.Size = UDim2.new(1, -16, 1, -16) -- 34x34 icon
+    openIcon.Size = UDim2.new(1, 0, 1, 0) -- Full size
     openIcon.AnchorPoint = Vector2.new(0.5, 0.5)
     openIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
     openIcon.BackgroundTransparency = 1
