@@ -1,0 +1,211 @@
+--[[
+    Valincia UI — Example Script
+    
+    Usage in executor:
+    loadstring(game:HttpGet("YOUR_RAW_URL/Example.lua"))()
+]]
+
+-- Load library and addons
+local repo = "https://raw.githubusercontent.com/valinciaeunha/valincia-ui-rblx/main/"
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+
+-- Create window
+local Window = Library:CreateWindow({
+    Title = "Valincia Example",
+    Footer = "v1.0.0",
+    Center = true,
+    AutoShow = true,
+    ToggleKeybind = Enum.KeyCode.RightControl,
+})
+
+-- Create tabs
+local Tabs = {
+    Main = Window:AddTab("Main"),
+    Combat = Window:AddTab("Combat"),
+    Visuals = Window:AddTab("Visuals"),
+    Settings = Window:AddTab("Settings"),
+}
+
+-- ═══════════════════════════════════════
+--  MAIN TAB
+-- ═══════════════════════════════════════
+local MainLeft = Tabs.Main:AddLeftGroupbox("General")
+local MainRight = Tabs.Main:AddRightGroupbox("Info")
+
+MainLeft:AddToggle("AutoFarm", {
+    Text = "Auto Farm",
+    Default = false,
+    Callback = function(value)
+        print("Auto Farm:", value)
+    end,
+})
+
+MainLeft:AddSlider("Speed", {
+    Text = "Walk Speed",
+    Default = 16,
+    Min = 0,
+    Max = 200,
+    Rounding = 0,
+    Callback = function(value)
+        print("Speed:", value)
+    end,
+})
+
+MainLeft:AddDropdown("Mode", {
+    Text = "Farm Mode",
+    Values = { "Closest", "Highest HP", "Lowest HP", "Random" },
+    Default = "Closest",
+    Callback = function(value)
+        print("Mode:", value)
+    end,
+})
+
+MainRight:AddLabel("Welcome to Valincia UI!")
+MainRight:AddDivider()
+MainRight:AddLabel("Press RightCtrl to toggle menu")
+
+MainRight:AddButton({
+    Text = "Print Hello",
+    Callback = function()
+        print("Hello from Valincia!")
+        Library:Notify({ Text = "Hello!", Duration = 2 })
+    end,
+})
+
+-- ═══════════════════════════════════════
+--  COMBAT TAB
+-- ═══════════════════════════════════════
+local CombatLeft = Tabs.Combat:AddLeftGroupbox("Aimbot")
+local CombatRight = Tabs.Combat:AddRightGroupbox("Reach")
+
+CombatLeft:AddToggle("AimbotEnabled", {
+    Text = "Enable Aimbot",
+    Default = false,
+})
+
+CombatLeft:AddSlider("AimbotFOV", {
+    Text = "FOV",
+    Default = 90,
+    Min = 10,
+    Max = 360,
+    Rounding = 0,
+    Suffix = "°",
+})
+
+CombatLeft:AddKeybind("AimbotKey", {
+    Text = "Aim Key",
+    Default = Enum.KeyCode.E,
+    Callback = function()
+        print("Aim key pressed!")
+    end,
+})
+
+CombatLeft:AddDropdown("AimbotTarget", {
+    Text = "Target Part",
+    Values = { "Head", "HumanoidRootPart", "Torso" },
+    Default = "Head",
+})
+
+CombatRight:AddToggle("ReachEnabled", {
+    Text = "Enable Reach",
+    Default = false,
+})
+
+CombatRight:AddSlider("ReachDistance", {
+    Text = "Distance",
+    Default = 10,
+    Min = 5,
+    Max = 30,
+    Rounding = 1,
+    Suffix = " studs",
+})
+
+-- ═══════════════════════════════════════
+--  VISUALS TAB
+-- ═══════════════════════════════════════
+local VisLeft = Tabs.Visuals:AddLeftGroupbox("ESP")
+local VisRight = Tabs.Visuals:AddRightGroupbox("World")
+
+VisLeft:AddToggle("ESPEnabled", {
+    Text = "Enable ESP",
+    Default = false,
+})
+
+VisLeft:AddColorPicker("ESPColor", {
+    Text = "ESP Color",
+    Default = Color3.fromRGB(255, 50, 50),
+})
+
+VisLeft:AddToggle("ESPNames", {
+    Text = "Show Names",
+    Default = true,
+})
+
+VisLeft:AddToggle("ESPBoxes", {
+    Text = "Show Boxes",
+    Default = true,
+})
+
+VisLeft:AddSlider("ESPDistance", {
+    Text = "Max Distance",
+    Default = 500,
+    Min = 100,
+    Max = 2000,
+    Rounding = 0,
+    Suffix = " studs",
+})
+
+VisRight:AddToggle("Fullbright", {
+    Text = "Fullbright",
+    Default = false,
+})
+
+VisRight:AddToggle("NoFog", {
+    Text = "Remove Fog",
+    Default = false,
+})
+
+-- Tabbox example
+local VisTabbox = Tabs.Visuals:AddRightTabbox("Chams")
+
+local ChamsGeneral = VisTabbox:AddTab("General")
+local ChamsSettings = VisTabbox:AddTab("Settings")
+
+ChamsGeneral:AddToggle("ChamsEnabled", {
+    Text = "Enable Chams",
+    Default = false,
+})
+
+ChamsSettings:AddColorPicker("ChamsColor", {
+    Text = "Chams Color",
+    Default = Color3.fromRGB(100, 200, 255),
+})
+
+ChamsSettings:AddSlider("ChamsTransparency", {
+    Text = "Transparency",
+    Default = 50,
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+    Suffix = "%",
+})
+
+-- ═══════════════════════════════════════
+--  SETTINGS TAB
+-- ═══════════════════════════════════════
+
+-- Hook managers
+SaveManager:SetLibrary(Library)
+SaveManager:SetFolder("ValinciaExample/game-name")
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+ThemeManager:SetLibrary(Library)
+ThemeManager:SetFolder("ValinciaExample")
+ThemeManager:ApplyToTab(Tabs.Settings)
+
+-- Load autoload config (if any)
+SaveManager:LoadAutoloadConfig()
