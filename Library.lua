@@ -203,7 +203,8 @@ function Library:CreateWindow(config)
     -- ScreenGui
     local screenGui = Instance.new("ScreenGui")
     screenGui.Name = "ValinciaUI_" .. uuid()
-    screenGui.ResetOnSpawn = false
+    screenGui.ResetOnSpawn = config.ResetOnSpawn or false
+    screenGui.IgnoreGuiInset = config.IgnoreGuiInset or false
     screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     screenGui.DisplayOrder = 999
 
@@ -693,6 +694,113 @@ function Tab:AddRightGroupbox(title) return self:AddGroupbox(title) end
 function Tab:AddTabbox(title) return Tabbox.new(self._contentFrame, title, self._window._library) end
 function Tab:AddLeftTabbox(title) return self:AddTabbox(title) end
 function Tab:AddRightTabbox(title) return self:AddTabbox(title) end
+
+--------------------------------------------------------------------------------
+-- Element: Viewport
+--------------------------------------------------------------------------------
+function Groupbox:AddViewport(config)
+    config = config or {}
+    local model = config.Model
+    local size = config.Size or UDim2.new(1, 0, 0, 200) -- Default height
+    local cameraDist = config.CameraDistance or 5
+    local order = self:_nextOrder()
+
+    local container = Instance.new("Frame")
+    container.Name = "ViewportElement"
+    container.Size = UDim2.new(1, 0, 0, 0)
+    container.AutomaticSize = Enum.AutomaticSize.Y
+    container.BackgroundTransparency = 1
+    container.LayoutOrder = order
+    container.Parent = self._content
+
+    local viewport = Instance.new("ViewportFrame")
+    viewport.Name = "Viewport"
+    viewport.Size = size
+    viewport.BackgroundTransparency = 1
+    viewport.BorderSizePixel = 0
+    viewport.Parent = container
+
+    local camera = Instance.new("Camera")
+    viewport.CurrentCamera = camera
+    camera.Parent = viewport
+
+    if model then
+        local m = model:Clone()
+        m.Parent = viewport
+        
+        -- Simple auto-camera positioning
+        local cf, size
+        if m:IsA("Model") then
+            cf, size = m:GetBoundingBox()
+        elseif m:IsA("BasePart") then
+            cf, size = m.CFrame, m.Size
+        end
+        
+        if cf and size then
+            local maxDim = math.max(size.X, size.Y, size.Z)
+            camera.CFrame = CFrame.new(cf.Position + Vector3.new(0, 0, maxDim * 1.5 + cameraDist), cf.Position)
+        end
+    end
+
+    return viewport
+end
+
+--------------------------------------------------------------------------------
+-- Element: Video
+--------------------------------------------------------------------------------
+function Groupbox:AddVideo(config)
+    config = config or {}
+    local videoId = config.Video
+    local size = config.Size or UDim2.new(1, 0, 0, 100) -- Default size
+    local order = self:_nextOrder()
+
+    local container = Instance.new("Frame")
+    container.Name = "VideoElement"
+    container.Size = UDim2.new(1, 0, 0, 0)
+    container.AutomaticSize = Enum.AutomaticSize.Y
+    container.BackgroundTransparency = 1
+    container.LayoutOrder = order
+    container.Parent = self._content
+
+    local video = Instance.new("VideoFrame")
+    video.Name = "Video"
+    video.Size = size
+    video.BackgroundTransparency = 1
+    video.Video = "rbxassetid://" .. tostring(videoId)
+    video.Looped = true
+    video.Playing = true
+    video.Parent = container
+
+    return video
+end
+
+--------------------------------------------------------------------------------
+-- Element: Image
+--------------------------------------------------------------------------------
+function Groupbox:AddImage(config)
+    config = config or {}
+    local imageId = config.Image
+    local size = config.Size or UDim2.new(1, 0, 0, 100) -- Default size
+    local order = self:_nextOrder()
+
+    local container = Instance.new("Frame")
+    container.Name = "ImageElement"
+    container.Size = UDim2.new(1, 0, 0, 0)
+    container.AutomaticSize = Enum.AutomaticSize.Y
+    container.BackgroundTransparency = 1
+    container.LayoutOrder = order
+    container.Parent = self._content
+
+    local image = Instance.new("ImageLabel")
+    image.Name = "Image"
+    image.Size = size
+    image.BackgroundTransparency = 1
+    image.Image = "rbxassetid://" .. tostring(imageId)
+    image.ScaleType = Enum.ScaleType.Fit
+    image.Parent = container
+
+    return image
+end
 
 --------------------------------------------------------------------------------
 -- Groupbox
@@ -1265,6 +1373,31 @@ function Groupbox:AddDropdown(flag, config)
 
     if flag and flag ~= "" then self._library.Options[flag] = dropdown end
     return dropdown
+end
+
+function Groupbox:AddDependency(dependency)
+    local element = self._library.Options[dependency.flag] or self._library.Toggles[dependency.flag]
+    if not element then return end
+
+    local function update()
+        local value = element.Value
+        if type(dependency.value) == "table" then
+            if table.find(dependency.value, value) then
+                self._content.Visible = true
+            else
+                self._content.Visible = false
+            end
+        else
+            if value == dependency.value then
+                self._content.Visible = true
+            else
+                self._content.Visible = false
+            end
+        end
+    end
+
+    element.OnChanged:Connect(update)
+    update()
 end
 
 --------------------------------------------------------------------------------

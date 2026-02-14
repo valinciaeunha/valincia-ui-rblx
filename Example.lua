@@ -83,6 +83,47 @@ MainGroup:AddDropdown("MultiTest", {
 local MainInfo = Tabs.Main:AddGroupbox("Info")
 MainInfo:AddLabel("Welcome to Valincia UI!")
 MainInfo:AddDivider()
+
+local VisualsGroup = Tabs.Main:AddGroupbox("Visuals & Logic")
+
+VisualsGroup:AddImage({
+    Image = 6015897843, -- Example Image ID
+    Size = UDim2.new(1, 0, 0, 100)
+})
+
+VisualsGroup:AddLabel("Viewport Frame (3D Model):")
+
+-- Attempt to find a suitable model for viewport demo
+local demoModel = workspace:FindFirstChildOfClass("Model") 
+if not demoModel then
+    demoModel = Instance.new("Part") -- Fallback if no model exists
+end
+
+VisualsGroup:AddViewport({
+    Model = demoModel,
+    Size = UDim2.new(1, 0, 0, 150),
+    CameraDistance = 10
+})
+
+VisualsGroup:AddDivider()
+
+VisualsGroup:AddToggle("MasterSwitch", {
+    Text = "Enable Secret Mode",
+    Default = false,
+})
+
+-- Dependency: Shows button only when 'MasterSwitch' is true
+VisualsGroup:AddDependency({
+    flag = "MasterSwitch",
+    value = true
+})
+
+VisualsGroup:AddButton({
+    Text = "Secret Action",
+    Func = function()
+        print("Secret activated!")
+    end
+})
 MainInfo:AddLabel("Press RightCtrl to toggle menu")
 MainInfo:AddLabel("Drag bottom-right corner to resize!")
 
