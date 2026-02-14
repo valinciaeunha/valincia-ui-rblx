@@ -149,8 +149,12 @@ local function validateKeyAPI(key)
         return HttpService:JSONDecode(response)
     end)
 
-    if not parseOk or not data then
+    if not parseOk or data == nil then
         return false, "Invalid server response"
+    end
+
+    if type(data) ~= "table" then
+        return false, "Unexpected server response: " .. tostring(data)
     end
 
     if data.valid == true then
