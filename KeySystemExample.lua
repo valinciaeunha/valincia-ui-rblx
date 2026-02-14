@@ -34,10 +34,18 @@ end
 -- Configuration — Change these for your script
 --------------------------------------------------------------------------------
 local CONFIG = {
-    -- API endpoint for key validation
-    -- The script will send: API_URL?key=ENTERED_KEY
-    -- Expected response: {"valid": true} or {"valid": false, "message": "reason"}
+    -- URL for key validation. Supports multiple formats:
+    --   1. JSON API:   Returns {"valid": true/false, "message": "..."}
+    --   2. Key List:   Plain text with one valid key per line
+    --   3. Leave empty ("") to use only local VALID_KEYS below
     API_URL = "https://file.vinzhub.com/f/Uka1zW",
+
+    -- Hardcoded valid keys (always checked first, before API)
+    -- Leave empty {} if you only want API validation
+    VALID_KEYS = {
+        "VALINCIA-XXXX-YYYY-ZZZZ",
+        "TEST-KEY-1234",
+    },
 
     -- Link where users can obtain a key
     KEY_URL = "https://linkvertise.com/YOUR_LINK_HERE",
@@ -132,36 +140,74 @@ function KeyStorage:Clear()
 end
 
 --------------------------------------------------------------------------------
--- API Validation
+-- Key Validation (Flexible: Local Keys + JSON API + Plain Text Key List)
 --------------------------------------------------------------------------------
-local function validateKeyAPI(key)
-    local url = CONFIG.API_URL .. "?key=" .. HttpService:UrlEncode(key)
+local function checkLocalKeys(key)
+    for _, validKey in ipairs(CONFIG.VALID_KEYS) do
+        if string.upper(key) == string.upper(validKey) then
+            return true
+        end
+    end
+    return false
+end
+
+local function validateKey(key)
+    -- Step 1: Check local hardcoded keys first
+    if #CONFIG.VALID_KEYS > 0 and checkLocalKeys(key) then
+        return true, "Key validated (local)"
+    end
+
+    -- Step 2: If API_URL is configured, validate via remote
+    if CONFIG.API_URL == "" then
+        return false, "Invalid key"
+    end
 
     local ok, response = pcall(function()
-        return game:HttpGet(url)
+        return game:HttpGet(CONFIG.API_URL)
     end)
 
-    if not ok then
+    if not ok or not response then
         return false, "Failed to connect to server"
     end
 
+    -- Try parsing as JSON first
     local parseOk, data = pcall(function()
         return HttpService:JSONDecode(response)
     end)
 
-    if not parseOk or data == nil then
-        return false, "Invalid server response"
+    if parseOk and type(data) == "table" then
+        -- Format A: JSON API response {"valid": true/false}
+        if data.valid ~= nil then
+            if data.valid == true then
+                return true, data.message or "Key validated"
+            else
+                return false, data.message or "Invalid key"
+            end
+        end
+
+        -- Format B: JSON array of valid keys ["KEY1", "KEY2", ...]
+        if #data > 0 then
+            for _, validKey in ipairs(data) do
+                if type(validKey) == "string" and string.upper(key) == string.upper(validKey) then
+                    return true, "Key validated"
+                end
+            end
+            return false, "Invalid key"
+        end
     end
 
-    if type(data) ~= "table" then
-        return false, "Unexpected server response: " .. tostring(data)
+    -- Format C: Plain text key list (one key per line)
+    if type(response) == "string" and #response > 0 then
+        for line in response:gmatch("[^\r\n]+") do
+            local trimmed = line:match("^%s*(.-)%s*$")
+            if trimmed and #trimmed > 0 and string.upper(key) == string.upper(trimmed) then
+                return true, "Key validated"
+            end
+        end
+        return false, "Invalid key"
     end
 
-    if data.valid == true then
-        return true, data.message or "Key validated"
-    else
-        return false, data.message or "Invalid key"
-    end
+    return false, "Could not validate key"
 end
 
 --------------------------------------------------------------------------------
@@ -186,7 +232,7 @@ local savedData = KeyStorage:Load()
 if savedData and not KeyStorage:IsExpired(savedData) then
     -- Saved key is still valid, verify with API one more time
     local remaining = KeyStorage:GetRemainingTime(savedData)
-    local isValid, msg = validateKeyAPI(savedData.key)
+    local isValid, msg = validateKey(savedData.key)
 
     if isValid then
         Library:Notify({
@@ -279,7 +325,7 @@ KeyGroup:AddButtonRow({
 
             -- Validate via API
             task.spawn(function()
-                local isValid, msg = validateKeyAPI(enteredKey)
+                local isValid, msg = validateKey(enteredKey)
 
                 if isValid then
                     -- Save key locally with timestamp
