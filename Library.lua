@@ -1045,10 +1045,7 @@ function Groupbox:AddDropdown(flag, config)
     mainBtn.Size = UDim2.new(1, 0, 0, 28)
     mainBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     mainBtn.BorderSizePixel = 0
-    mainBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
-    mainBtn.TextSize = 12
-    mainBtn.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
-    mainBtn.TextXAlignment = Enum.TextXAlignment.Left
+    mainBtn.Text = "" -- Handled by child label
     mainBtn.AutoButtonColor = false
     mainBtn.LayoutOrder = 2
     mainBtn.Parent = container
@@ -1056,8 +1053,20 @@ function Groupbox:AddDropdown(flag, config)
     Instance.new("UICorner", mainBtn).CornerRadius = UDim.new(0, 4)
     local btnStroke = Instance.new("UIStroke", mainBtn)
     btnStroke.Color = Color3.fromRGB(60, 60, 60); btnStroke.Thickness = 1
-    local btnPad = Instance.new("UIPadding", mainBtn)
-    btnPad.PaddingLeft = UDim.new(0, 8)
+    
+    -- Value Display Label (Truncates correctly)
+    local valLabel = Instance.new("TextLabel")
+    valLabel.Name = "Value"
+    valLabel.Size = UDim2.new(1, -32, 1, 0) -- Leave room for chevron
+    valLabel.Position = UDim2.new(0, 8, 0, 0)
+    valLabel.BackgroundTransparency = 1
+    valLabel.Text = ""
+    valLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    valLabel.TextSize = 12
+    valLabel.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
+    valLabel.TextXAlignment = Enum.TextXAlignment.Left
+    valLabel.TextTruncate = Enum.TextTruncate.AtEnd
+    valLabel.Parent = mainBtn
 
     -- Chevron Icon
     local chevIcon = Library:GetIcon("chevron-down")
@@ -1141,23 +1150,15 @@ function Groupbox:AddDropdown(flag, config)
         local v = dropdown.Value
         if multi then
             if type(v) == "table" and #v > 0 then 
-                local str = table.concat(v, ", ")
-                if #str > 40 then
-                    str = string.sub(str, 1, 40) .. "..."
-                end
-                mainBtn.Text = str
-                mainBtn.TextColor3 = Color3.fromRGB(240, 240, 240)
+                valLabel.Text = table.concat(v, ", ") 
+                valLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
             else 
-                mainBtn.Text = "None"
-                mainBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+                valLabel.Text = "None"
+                valLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
             end
         else
-            local str = v and tostring(v) or "Select..."
-            if #str > 40 then
-                str = string.sub(str, 1, 40) .. "..."
-            end
-            mainBtn.Text = str
-            mainBtn.TextColor3 = v and Color3.fromRGB(240, 240, 240) or Color3.fromRGB(180, 180, 180)
+            valLabel.Text = v and tostring(v) or "Select..."
+            valLabel.TextColor3 = v and Color3.fromRGB(240, 240, 240) or Color3.fromRGB(180, 180, 180)
         end
     end
 
