@@ -1614,6 +1614,56 @@ function Groupbox:AddButton(config)
     return obj
 end
 
+function Groupbox:AddButtonRow(buttons)
+    buttons = buttons or {}
+    local order = self:_nextOrder()
+
+    local row = Instance.new("Frame")
+    row.Name = "ButtonRow"
+    row.Size = UDim2.new(1, 0, 0, 28)
+    row.BackgroundTransparency = 1
+    row.LayoutOrder = order
+    row.Parent = self._content
+
+    local rowLayout = Instance.new("UIListLayout")
+    rowLayout.FillDirection = Enum.FillDirection.Horizontal
+    rowLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    rowLayout.Padding = UDim.new(0, 6)
+    rowLayout.Parent = row
+
+    local objs = {}
+    for i, cfg in ipairs(buttons) do
+        local text = cfg.Text or "Button"
+        local callback = cfg.Callback or cfg.Func
+
+        local btn = Instance.new("TextButton")
+        btn.Name = "Btn_" .. text
+        btn.Size = UDim2.new(1 / #buttons, -math.ceil(6 * (#buttons - 1) / #buttons), 1, 0)
+        btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        btn.BorderSizePixel = 0
+        btn.Text = text
+        btn.TextColor3 = Color3.fromRGB(220, 220, 220)
+        btn.TextSize = 12
+        btn.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium)
+        btn.AutoButtonColor = false
+        btn.LayoutOrder = i
+        btn.Parent = row
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+
+        btn.MouseEnter:Connect(function() btn.BackgroundColor3 = Color3.fromRGB(55, 55, 55) end)
+        btn.MouseLeave:Connect(function() btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45) end)
+        btn.MouseButton1Click:Connect(function()
+            if callback then Library:SafeCallback(callback) end
+        end)
+
+        local obj = {}
+        function obj:SetText(t) btn.Text = t end
+        table.insert(objs, obj)
+    end
+
+    return objs
+end
+
 function Groupbox:AddDivider()
     local order = self:_nextOrder()
     local div = Instance.new("Frame")
