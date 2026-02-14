@@ -65,6 +65,9 @@ end
 local TWEEN_FAST = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 local TWEEN_MED = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
+-- Forward declarations (needed because Window references Tab, Tab references Groupbox, etc.)
+local Tab, Groupbox, Tabbox
+
 --------------------------------------------------------------------------------
 -- Signal (lightweight event system)
 --------------------------------------------------------------------------------
@@ -623,7 +626,7 @@ end
 --------------------------------------------------------------------------------
 -- Tab
 --------------------------------------------------------------------------------
-local Tab = {}
+Tab = {}
 Tab.__index = Tab
 
 function Tab.new(window, name, icon)
@@ -703,7 +706,7 @@ function Tab:AddRightTabbox(title) return self:AddTabbox(title) end
 --------------------------------------------------------------------------------
 -- Groupbox
 --------------------------------------------------------------------------------
-local Groupbox = {}
+Groupbox = {}
 Groupbox.__index = Groupbox
 
 function Groupbox.new(contentFrame, title, library)
@@ -1748,7 +1751,7 @@ end
 --------------------------------------------------------------------------------
 -- Tabbox
 --------------------------------------------------------------------------------
-local Tabbox = {}
+Tabbox = {}
 Tabbox.__index = Tabbox
 
 function Tabbox.new(parent, title, library)
