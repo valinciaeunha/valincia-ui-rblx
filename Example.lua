@@ -7,9 +7,16 @@
 
 -- Load library and addons
 local repo = "https://raw.githubusercontent.com/valinciaeunha/valincia-ui-rblx/main/"
+
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+
+-- Unload previous instance
+if getgenv().ValinciaUI then
+    getgenv().ValinciaUI:Unload()
+end
+getgenv().ValinciaUI = Library
 
 -- Create window
 local Window = Library:CreateWindow({

@@ -83,6 +83,7 @@ local Library = {
     Toggles = {},
     Options = {},
     _windows = {},
+    _connections = {},
     _unloaded = false,
     ForceCheckbox = false,
     ToggleKeybind = nil,
@@ -95,9 +96,21 @@ function Library:SafeCallback(fn, ...)
     if not ok then warn("[Valincia] Callback error:", err) end
 end
 
+function Library:Connect(signal, callback)
+    local conn = signal:Connect(callback)
+    table.insert(self._connections, conn)
+    return conn
+end
+
 function Library:Unload()
     if self._unloaded then return end
     self._unloaded = true
+    
+    for _, c in ipairs(self._connections) do
+        if c and c.Connected then c:Disconnect() end
+    end
+    self._connections = {}
+
     if self._screenGui then
         self._screenGui:Destroy()
         self._screenGui = nil
@@ -265,13 +278,13 @@ function Library:CreateWindow(config)
             startPos = main.Position
         end
     end)
-    UserInputService.InputChanged:Connect(function(input)
+    self:Connect(UserInputService.InputChanged, function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
             main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
-    UserInputService.InputEnded:Connect(function(input)
+    self:Connect(UserInputService.InputEnded, function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = false
         end
@@ -379,13 +392,13 @@ function Library:CreateWindow(config)
             startPosOpen = openBtn.Position
         end
     end)
-    UserInputService.InputChanged:Connect(function(input)
+    self:Connect(UserInputService.InputChanged, function(input)
         if draggingOpen and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStartOpen
             openBtn.Position = UDim2.new(startPosOpen.X.Scale, startPosOpen.X.Offset + delta.X, startPosOpen.Y.Scale, startPosOpen.Y.Offset + delta.Y)
         end
     end)
-    UserInputService.InputEnded:Connect(function(input)
+    self:Connect(UserInputService.InputEnded, function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             draggingOpen = false
         end
@@ -429,7 +442,7 @@ function Library:CreateWindow(config)
         end
     end)
 
-    UserInputService.InputChanged:Connect(function(input)
+    self:Connect(UserInputService.InputChanged, function(input)
         if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - resizeStart
             local newX = math.max(300, startSize.X + delta.X)
@@ -438,7 +451,7 @@ function Library:CreateWindow(config)
         end
     end)
     
-    UserInputService.InputEnded:Connect(function(input)
+    self:Connect(UserInputService.InputEnded, function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             resizing = false
         end
@@ -446,7 +459,7 @@ function Library:CreateWindow(config)
 
     -- Toggle keybind
     self.ToggleKeybind = toggleKey
-    UserInputService.InputBegan:Connect(function(input, gpe)
+    self:Connect(UserInputService.InputBegan, function(input, gpe)
         if gpe then return end
         if input.KeyCode == self.ToggleKeybind then
             setVisible(not main.Visible)
@@ -867,12 +880,12 @@ function Groupbox:AddSlider(flag, config)
             update(input.Position)
         end
     end)
-    UserInputService.InputChanged:Connect(function(input)
+    self._library:Connect(UserInputService.InputChanged, function(input)
         if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             update(input.Position)
         end
     end)
-    UserInputService.InputEnded:Connect(function(input)
+    self._library:Connect(UserInputService.InputEnded, function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             isDragging = false
         end
@@ -1154,7 +1167,7 @@ function Groupbox:AddKeybind(flag, config)
         listening = true; keyBtn.Text = "..."; kStroke.Color = Color3.fromRGB(96, 130, 255)
     end)
 
-    UserInputService.InputBegan:Connect(function(inp, gpe)
+    self._library:Connect(UserInputService.InputBegan, function(inp, gpe)
         if listening and inp.UserInputType == Enum.UserInputType.Keyboard then
             if inp.KeyCode == Enum.KeyCode.Escape then keybind.Value = Enum.KeyCode.Unknown
             else keybind.Value = inp.KeyCode end
