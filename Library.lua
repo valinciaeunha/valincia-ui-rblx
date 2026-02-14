@@ -134,7 +134,11 @@ function Library:Unload()
     self._unloaded = true
     
     for _, c in ipairs(self._connections) do
-        if c and c.Connected then c:Disconnect() end
+        if c and typeof(c) == "RBXScriptConnection" then
+            if c.Connected then c:Disconnect() end
+        elseif c and c.Disconnect then
+            c:Disconnect()
+        end
     end
     self._connections = {}
 
@@ -439,13 +443,7 @@ function Library:CreateWindow(config)
     self:Connect(closeBtn.MouseEnter, function() closeIconImg.ImageColor3 = Color3.fromRGB(255, 80, 80) end)
     self:Connect(closeBtn.MouseLeave, function() closeIconImg.ImageColor3 = Color3.fromRGB(150, 150, 150) end)
 
-    minBtn.MouseButton1Click:Connect(function()
-        Window:Toggle(false)
-    end)
-
-    closeBtn.MouseButton1Click:Connect(function()
-        Library:Unload()
-    end)
+    -- (Handled by setVisible/Unload below)
 
     -- Floating Open Button (Right center of screen)
     local openBtn = Instance.new("TextButton") -- Changed to TextButton to be container
@@ -523,7 +521,6 @@ function Library:CreateWindow(config)
         self:Unload()
     end)
 
-    -- Resize Handle (Bottom Right)
     -- Resize Handle (Bottom Right)
     local resizeIcon = self:GetIcon("maximize-2")
     local resizeHandle = Instance.new("ImageButton")
@@ -626,7 +623,7 @@ end
 --------------------------------------------------------------------------------
 -- Tab
 --------------------------------------------------------------------------------
-Tab = {}
+local Tab = {}
 Tab.__index = Tab
 
 function Tab.new(window, name, icon)
@@ -704,19 +701,9 @@ function Tab:AddLeftTabbox(title) return self:AddTabbox(title) end
 function Tab:AddRightTabbox(title) return self:AddTabbox(title) end
 
 --------------------------------------------------------------------------------
--- Element: Viewport
---------------------------------------------------------------------------------
-
-
---------------------------------------------------------------------------------
--- Element: Video
---------------------------------------------------------------------------------
--- Element: Image
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Groupbox
 --------------------------------------------------------------------------------
-Groupbox = {}
+local Groupbox = {}
 Groupbox.__index = Groupbox
 
 function Groupbox.new(contentFrame, title, library)
@@ -813,15 +800,15 @@ function Groupbox:AddViewport(config)
         m.Parent = viewport
         
         -- Simple auto-camera positioning
-        local cf, size
+        local cf, boundSize
         if m:IsA("Model") then
-            cf, size = m:GetBoundingBox()
+            cf, boundSize = m:GetBoundingBox()
         elseif m:IsA("BasePart") then
-            cf, size = m.CFrame, m.Size
+            cf, boundSize = m.CFrame, m.Size
         end
         
-        if cf and size then
-            local maxDim = math.max(size.X, size.Y, size.Z)
+        if cf and boundSize then
+            local maxDim = math.max(boundSize.X, boundSize.Y, boundSize.Z)
             camera.CFrame = CFrame.new(cf.Position + Vector3.new(0, 0, maxDim * 1.5 + cameraDist), cf.Position)
         end
     end
@@ -835,7 +822,8 @@ end
 function Groupbox:AddVideo(config)
     config = config or {}
     local videoId = config.Video
-    local size = config.Size or UDim2.new(1, 0, 0, 100) -- Default size
+    if not videoId then warn("[Valincia] AddVideo: No Video ID provided") return end
+    local size = config.Size or UDim2.new(1, 0, 0, 100)
     local order = self:_nextOrder()
 
     local container = Instance.new("Frame")
@@ -864,7 +852,8 @@ end
 function Groupbox:AddImage(config)
     config = config or {}
     local imageId = config.Image
-    local size = config.Size or UDim2.new(1, 0, 0, 100) -- Default size
+    if not imageId then warn("[Valincia] AddImage: No Image ID provided") return end
+    local size = config.Size or UDim2.new(1, 0, 0, 100)
     local order = self:_nextOrder()
 
     local container = Instance.new("Frame")
@@ -1171,7 +1160,8 @@ function Groupbox:AddDropdown(flag, config)
 
     Instance.new("UICorner", mainBtn).CornerRadius = UDim.new(0, 4)
     local btnStroke = Instance.new("UIStroke", mainBtn)
-    btnStroke.Color = Color3.fromRGB(60, 60, 60); btnStroke.Thickness = 1
+    btnStroke.Color = Color3.fromRGB(60, 60, 60)
+    btnStroke.Thickness = 1
     
     -- Value Display Label (Truncates correctly)
     local valLabel = Instance.new("TextLabel")
@@ -1216,7 +1206,8 @@ function Groupbox:AddDropdown(flag, config)
     
     Instance.new("UICorner", optFrame).CornerRadius = UDim.new(0, 4)
     local optStroke = Instance.new("UIStroke", optFrame)
-    optStroke.Color = Color3.fromRGB(55, 55, 55); optStroke.Thickness = 1
+    optStroke.Color = Color3.fromRGB(55, 55, 55)
+    optStroke.Thickness = 1
     
     local optList = Instance.new("UIListLayout", optFrame)
     optList.Padding = UDim.new(0, 1)
@@ -1452,9 +1443,11 @@ function Groupbox:AddInput(flag, config)
     inputFrame.Parent = container
     Instance.new("UICorner", inputFrame).CornerRadius = UDim.new(0, 4)
     local iStroke = Instance.new("UIStroke", inputFrame)
-    iStroke.Color = Color3.fromRGB(60, 60, 60); iStroke.Thickness = 1
+    iStroke.Color = Color3.fromRGB(60, 60, 60)
+    iStroke.Thickness = 1
     local iPad = Instance.new("UIPadding", inputFrame)
-    iPad.PaddingLeft = UDim.new(0, 6); iPad.PaddingRight = UDim.new(0, 6)
+    iPad.PaddingLeft = UDim.new(0, 6)
+    iPad.PaddingRight = UDim.new(0, 6)
 
     local textBox = Instance.new("TextBox")
     textBox.Size = UDim2.new(1, 0, 1, 0)
@@ -1531,7 +1524,8 @@ function Groupbox:AddKeybind(flag, config)
     keyBtn.Parent = container
     Instance.new("UICorner", keyBtn).CornerRadius = UDim.new(0, 4)
     local kStroke = Instance.new("UIStroke", keyBtn)
-    kStroke.Color = Color3.fromRGB(60, 60, 60); kStroke.Thickness = 1
+    kStroke.Color = Color3.fromRGB(60, 60, 60)
+    kStroke.Thickness = 1
 
     local listening = false
     local function display()
@@ -1539,14 +1533,18 @@ function Groupbox:AddKeybind(flag, config)
     end
 
     keyBtn.MouseButton1Click:Connect(function()
-        listening = true; keyBtn.Text = "..."; kStroke.Color = Color3.fromRGB(96, 130, 255)
+        listening = true
+        keyBtn.Text = "..."
+        kStroke.Color = Color3.fromRGB(96, 130, 255)
     end)
 
     self._library:Connect(UserInputService.InputBegan, function(inp, gpe)
         if listening and inp.UserInputType == Enum.UserInputType.Keyboard then
             if inp.KeyCode == Enum.KeyCode.Escape then keybind.Value = Enum.KeyCode.Unknown
             else keybind.Value = inp.KeyCode end
-            listening = false; display(); kStroke.Color = Color3.fromRGB(60, 60, 60)
+            listening = false
+            display()
+            kStroke.Color = Color3.fromRGB(60, 60, 60)
             keybind.OnChanged:Fire(keybind.Value)
             return
         end
@@ -1676,7 +1674,8 @@ function Groupbox:AddColorPicker(flag, config)
     swatch.Parent = container
     Instance.new("UICorner", swatch).CornerRadius = UDim.new(0, 4)
     local swStroke = Instance.new("UIStroke", swatch)
-    swStroke.Color = Color3.fromRGB(70, 70, 70); swStroke.Thickness = 1
+    swStroke.Color = Color3.fromRGB(70, 70, 70)
+    swStroke.Thickness = 1
 
     function picker:SetValue(c) picker.Value = c; swatch.BackgroundColor3 = c end
     function picker:GetValue() return picker.Value end
@@ -1699,7 +1698,7 @@ end
 --------------------------------------------------------------------------------
 -- Tabbox
 --------------------------------------------------------------------------------
-Tabbox = {}
+local Tabbox = {}
 Tabbox.__index = Tabbox
 
 function Tabbox.new(parent, title, library)
@@ -1717,7 +1716,8 @@ function Tabbox.new(parent, title, library)
     container.Parent = parent
     Instance.new("UICorner", container).CornerRadius = UDim.new(0, 6)
     local tbStroke = Instance.new("UIStroke", container)
-    tbStroke.Color = Color3.fromRGB(45, 45, 45); tbStroke.Thickness = 1
+    tbStroke.Color = Color3.fromRGB(45, 45, 45)
+    tbStroke.Thickness = 1
 
     -- Tab header bar
     local headerBar = Instance.new("Frame")
@@ -1729,8 +1729,11 @@ function Tabbox.new(parent, title, library)
     headerBar.Parent = container
     Instance.new("UICorner", headerBar).CornerRadius = UDim.new(0, 6)
     local hfix = Instance.new("Frame")
-    hfix.Size = UDim2.new(1, 0, 0, 8); hfix.Position = UDim2.new(0, 0, 1, -8)
-    hfix.BackgroundColor3 = Color3.fromRGB(20, 20, 20); hfix.BorderSizePixel = 0; hfix.Parent = headerBar
+    hfix.Size = UDim2.new(1, 0, 0, 8)
+    hfix.Position = UDim2.new(0, 0, 1, -8)
+    hfix.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    hfix.BorderSizePixel = 0
+    hfix.Parent = headerBar
 
     local headerLayout = Instance.new("UIListLayout")
     headerLayout.FillDirection = Enum.FillDirection.Horizontal
@@ -1790,7 +1793,7 @@ function Tabbox:AddTab(name)
     local subGroup = setmetatable({
         _library = self._library,
         _content = contentFrame,
-        _elementCount = 0,
+        _order = 0,
     }, Groupbox)
 
     tabData._btn = tabBtn

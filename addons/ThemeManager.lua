@@ -92,6 +92,7 @@ ThemeManager._themes["Ocean"] = {
 
 function ThemeManager:SetLibrary(lib)
     self._library = lib
+    self:LoadCustomThemes()
 end
 
 function ThemeManager:SetFolder(folder)
