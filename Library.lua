@@ -14,7 +14,27 @@ local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
 --------------------------------------------------------------------------------
--- Utilities
+--// Icon Module \\--
+type Icon = {
+    Url: string,
+    Id: number,
+    IconName: string,
+    ImageRectOffset: Vector2,
+    ImageRectSize: Vector2,
+}
+
+type IconModule = {
+    Icons: { string },
+    GetAsset: (Name: string) -> Icon?,
+}
+
+local FetchIcons, Icons = pcall(function()
+    return (loadstring(
+        game:HttpGet("https://raw.githubusercontent.com/deividcomsono/lucide-roblox-direct/refs/heads/main/source.lua")
+    ) :: () -> IconModule)()
+end)
+
+--// Utils \\--
 --------------------------------------------------------------------------------
 local function deepCopy(t)
     if type(t) ~= "table" then return t end
@@ -94,6 +114,13 @@ function Library:SafeCallback(fn, ...)
     if not fn then return end
     local ok, err = pcall(fn, ...)
     if not ok then warn("[Valincia] Callback error:", err) end
+end
+
+function Library:GetIcon(IconName: string)
+    if not FetchIcons then return end
+    local Success, Icon = pcall(Icons.GetAsset, IconName)
+    if not Success then return end
+    return Icon
 end
 
 function Library:Connect(signal, callback)
@@ -337,7 +364,16 @@ function Library:CreateWindow(config)
     minBtn.Size = UDim2.new(0, 36, 1, 0)
     minBtn.Position = UDim2.new(1, -72, 0, 0)
     minBtn.BackgroundTransparency = 1
-    minBtn.Image = "rbxassetid://9886659406" -- Lucide Minus
+    
+    local minIcon = Library:GetIcon("minus")
+    if minIcon then
+        minBtn.Image = minIcon.Url
+        minBtn.ImageRectOffset = minIcon.ImageRectOffset
+        minBtn.ImageRectSize = minIcon.ImageRectSize
+    else
+        minBtn.Image = "rbxassetid://9886659406" -- Fallback
+    end
+
     minBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
     minBtn.ZIndex = 11
     minBtn.Parent = titleBar
@@ -351,7 +387,16 @@ function Library:CreateWindow(config)
     closeBtn.Size = UDim2.new(0, 36, 1, 0)
     closeBtn.Position = UDim2.new(1, -36, 0, 0)
     closeBtn.BackgroundTransparency = 1
-    closeBtn.Image = "rbxassetid://9886659671" -- Lucide Close
+
+    local closeIcon = Library:GetIcon("x")
+    if closeIcon then
+        closeBtn.Image = closeIcon.Url
+        closeBtn.ImageRectOffset = closeIcon.ImageRectOffset
+        closeBtn.ImageRectSize = closeIcon.ImageRectSize
+    else
+        closeBtn.Image = "rbxassetid://9886659671" -- Fallback
+    end
+
     closeBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
     closeBtn.ZIndex = 11
     closeBtn.Parent = titleBar
