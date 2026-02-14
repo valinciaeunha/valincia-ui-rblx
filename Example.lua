@@ -32,10 +32,9 @@ local Tabs = {
 -- ═══════════════════════════════════════
 --  MAIN TAB
 -- ═══════════════════════════════════════
-local MainLeft = Tabs.Main:AddLeftGroupbox("General")
-local MainRight = Tabs.Main:AddRightGroupbox("Info")
+local MainGroup = Tabs.Main:AddGroupbox("General")
 
-MainLeft:AddToggle("AutoFarm", {
+MainGroup:AddToggle("AutoFarm", {
     Text = "Auto Farm",
     Default = false,
     Callback = function(value)
@@ -43,7 +42,7 @@ MainLeft:AddToggle("AutoFarm", {
     end,
 })
 
-MainLeft:AddSlider("Speed", {
+MainGroup:AddSlider("Speed", {
     Text = "Walk Speed",
     Default = 16,
     Min = 0,
@@ -54,7 +53,7 @@ MainLeft:AddSlider("Speed", {
     end,
 })
 
-MainLeft:AddDropdown("Mode", {
+MainGroup:AddDropdown("Mode", {
     Text = "Farm Mode",
     Values = { "Closest", "Highest HP", "Lowest HP", "Random" },
     Default = "Closest",
@@ -63,11 +62,13 @@ MainLeft:AddDropdown("Mode", {
     end,
 })
 
-MainRight:AddLabel("Welcome to Valincia UI!")
-MainRight:AddDivider()
-MainRight:AddLabel("Press RightCtrl to toggle menu")
+local MainInfo = Tabs.Main:AddGroupbox("Info")
+MainInfo:AddLabel("Welcome to Valincia UI!")
+MainInfo:AddDivider()
+MainInfo:AddLabel("Press RightCtrl to toggle menu")
+MainInfo:AddLabel("Drag bottom-right corner to resize!")
 
-MainRight:AddButton({
+MainInfo:AddButton({
     Text = "Print Hello",
     Callback = function()
         print("Hello from Valincia!")
@@ -78,15 +79,14 @@ MainRight:AddButton({
 -- ═══════════════════════════════════════
 --  COMBAT TAB
 -- ═══════════════════════════════════════
-local CombatLeft = Tabs.Combat:AddLeftGroupbox("Aimbot")
-local CombatRight = Tabs.Combat:AddRightGroupbox("Reach")
+local CombatGroup = Tabs.Combat:AddGroupbox("Aimbot & Reach")
 
-CombatLeft:AddToggle("AimbotEnabled", {
+CombatGroup:AddToggle("AimbotEnabled", {
     Text = "Enable Aimbot",
     Default = false,
 })
 
-CombatLeft:AddSlider("AimbotFOV", {
+CombatGroup:AddSlider("AimbotFOV", {
     Text = "FOV",
     Default = 90,
     Min = 10,
@@ -95,7 +95,7 @@ CombatLeft:AddSlider("AimbotFOV", {
     Suffix = "°",
 })
 
-CombatLeft:AddKeybind("AimbotKey", {
+CombatGroup:AddKeybind("AimbotKey", {
     Text = "Aim Key",
     Default = Enum.KeyCode.E,
     Callback = function()
@@ -103,18 +103,20 @@ CombatLeft:AddKeybind("AimbotKey", {
     end,
 })
 
-CombatLeft:AddDropdown("AimbotTarget", {
+CombatGroup:AddDropdown("AimbotTarget", {
     Text = "Target Part",
     Values = { "Head", "HumanoidRootPart", "Torso" },
     Default = "Head",
 })
 
-CombatRight:AddToggle("ReachEnabled", {
+CombatGroup:AddDivider()
+
+CombatGroup:AddToggle("ReachEnabled", {
     Text = "Enable Reach",
     Default = false,
 })
 
-CombatRight:AddSlider("ReachDistance", {
+CombatGroup:AddSlider("ReachDistance", {
     Text = "Distance",
     Default = 10,
     Min = 5,
@@ -126,30 +128,29 @@ CombatRight:AddSlider("ReachDistance", {
 -- ═══════════════════════════════════════
 --  VISUALS TAB
 -- ═══════════════════════════════════════
-local VisLeft = Tabs.Visuals:AddLeftGroupbox("ESP")
-local VisRight = Tabs.Visuals:AddRightGroupbox("World")
+local VisGroup = Tabs.Visuals:AddGroupbox("ESP Settings")
 
-VisLeft:AddToggle("ESPEnabled", {
+VisGroup:AddToggle("ESPEnabled", {
     Text = "Enable ESP",
     Default = false,
 })
 
-VisLeft:AddColorPicker("ESPColor", {
+VisGroup:AddColorPicker("ESPColor", {
     Text = "ESP Color",
     Default = Color3.fromRGB(255, 50, 50),
 })
 
-VisLeft:AddToggle("ESPNames", {
+VisGroup:AddToggle("ESPNames", {
     Text = "Show Names",
     Default = true,
 })
 
-VisLeft:AddToggle("ESPBoxes", {
+VisGroup:AddToggle("ESPBoxes", {
     Text = "Show Boxes",
     Default = true,
 })
 
-VisLeft:AddSlider("ESPDistance", {
+VisGroup:AddSlider("ESPDistance", {
     Text = "Max Distance",
     Default = 500,
     Min = 100,
@@ -158,18 +159,20 @@ VisLeft:AddSlider("ESPDistance", {
     Suffix = " studs",
 })
 
-VisRight:AddToggle("Fullbright", {
+VisGroup:AddDivider()
+
+VisGroup:AddToggle("Fullbright", {
     Text = "Fullbright",
     Default = false,
 })
 
-VisRight:AddToggle("NoFog", {
+VisGroup:AddToggle("NoFog", {
     Text = "Remove Fog",
     Default = false,
 })
 
 -- Tabbox example
-local VisTabbox = Tabs.Visuals:AddRightTabbox("Chams")
+local VisTabbox = Tabs.Visuals:AddTabbox("Chams")
 
 local ChamsGeneral = VisTabbox:AddTab("General")
 local ChamsSettings = VisTabbox:AddTab("Settings")

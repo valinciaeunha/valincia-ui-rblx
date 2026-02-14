@@ -409,6 +409,41 @@ function Library:CreateWindow(config)
         self:Unload()
     end)
 
+    -- Resize Handle (Bottom Right)
+    local resizeHandle = Instance.new("ImageButton")
+    resizeHandle.Name = "ResizeHandle"
+    resizeHandle.Size = UDim2.new(0, 16, 0, 16)
+    resizeHandle.Position = UDim2.new(1, -16, 1, -16)
+    resizeHandle.BackgroundTransparency = 1
+    resizeHandle.Image = "rbxassetid://10656726569" -- Resize corner icon
+    resizeHandle.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    resizeHandle.ImageTransparency = 0.5
+    resizeHandle.Parent = main
+
+    local resizing, resizeStart, startSize
+    resizeHandle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            resizing = true
+            resizeStart = input.Position
+            startSize = main.AbsoluteSize
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - resizeStart
+            local newX = math.max(300, startSize.X + delta.X)
+            local newY = math.max(200, startSize.Y + delta.Y)
+            main.Size = UDim2.new(0, newX, 0, newY)
+        end
+    end)
+    
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            resizing = false
+        end
+    end)
+
     -- Toggle keybind
     self.ToggleKeybind = toggleKey
     UserInputService.InputBegan:Connect(function(input, gpe)
@@ -504,7 +539,7 @@ function Tab.new(window, name, icon)
         window:_switchTab(self)
     end)
 
-    -- Content frame (two columns)
+    -- Content frame (single column)
     local contentFrame = Instance.new("ScrollingFrame")
     contentFrame.Name = "TabContent_" .. name
     contentFrame.Size = UDim2.new(1, 0, 1, 0)
@@ -517,64 +552,34 @@ function Tab.new(window, name, icon)
     contentFrame.Visible = false
     contentFrame.Parent = window._contentArea
 
+    local contentLayout = Instance.new("UIListLayout")
+    contentLayout.FillDirection = Enum.FillDirection.Vertical
+    contentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    contentLayout.Padding = UDim.new(0, 10)
+    contentLayout.Parent = contentFrame
+
     local contentPad = Instance.new("UIPadding")
-    contentPad.PaddingTop = UDim.new(0, 8)
-    contentPad.PaddingLeft = UDim.new(0, 8)
-    contentPad.PaddingRight = UDim.new(0, 8)
-    contentPad.PaddingBottom = UDim.new(0, 8)
+    contentPad.PaddingTop = UDim.new(0, 10)
+    contentPad.PaddingLeft = UDim.new(0, 10)
+    contentPad.PaddingRight = UDim.new(0, 10)
+    contentPad.PaddingBottom = UDim.new(0, 10)
     contentPad.Parent = contentFrame
-
-    -- Two columns
-    local leftCol = Instance.new("Frame")
-    leftCol.Name = "Left"
-    leftCol.Size = UDim2.new(0.5, -4, 0, 0)
-    leftCol.AutomaticSize = Enum.AutomaticSize.Y
-    leftCol.BackgroundTransparency = 1
-    leftCol.Parent = contentFrame
-
-    local leftLayout = Instance.new("UIListLayout")
-    leftLayout.FillDirection = Enum.FillDirection.Vertical
-    leftLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    leftLayout.Padding = UDim.new(0, 8)
-    leftLayout.Parent = leftCol
-
-    local rightCol = Instance.new("Frame")
-    rightCol.Name = "Right"
-    rightCol.Size = UDim2.new(0.5, -4, 0, 0)
-    rightCol.Position = UDim2.new(0.5, 4, 0, 0)
-    rightCol.AutomaticSize = Enum.AutomaticSize.Y
-    rightCol.BackgroundTransparency = 1
-    rightCol.Parent = contentFrame
-
-    local rightLayout = Instance.new("UIListLayout")
-    rightLayout.FillDirection = Enum.FillDirection.Vertical
-    rightLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    rightLayout.Padding = UDim.new(0, 8)
-    rightLayout.Parent = rightCol
 
     self._tabButton = tabBtn
     self._contentFrame = contentFrame
-    self._leftCol = leftCol
-    self._rightCol = rightCol
 
     return self
 end
 
-function Tab:AddLeftGroupbox(title, icon)
-    return Groupbox.new(self._leftCol, title, self._window._library)
+function Tab:AddGroupbox(title)
+    return Groupbox.new(self._contentFrame, title, self._window._library)
 end
 
-function Tab:AddRightGroupbox(title, icon)
-    return Groupbox.new(self._rightCol, title, self._window._library)
-end
-
-function Tab:AddLeftTabbox(title)
-    return Tabbox.new(self._leftCol, title, self._window._library)
-end
-
-function Tab:AddRightTabbox(title)
-    return Tabbox.new(self._rightCol, title, self._window._library)
-end
+function Tab:AddLeftGroupbox(title) return self:AddGroupbox(title) end
+function Tab:AddRightGroupbox(title) return self:AddGroupbox(title) end
+function Tab:AddTabbox(title) return Tabbox.new(self._contentFrame, title, self._window._library) end
+function Tab:AddLeftTabbox(title) return self:AddTabbox(title) end
+function Tab:AddRightTabbox(title) return self:AddTabbox(title) end
 
 --------------------------------------------------------------------------------
 -- Groupbox
