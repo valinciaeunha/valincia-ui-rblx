@@ -70,6 +70,16 @@ MainGroup:AddDropdown("Mode", {
     end,
 })
 
+MainGroup:AddDropdown("MultiTest", {
+    Text = "Multi Selection",
+    Values = { "Apple", "Banana", "Cherry", "Date", "Elderberry", "Fig", "Grape" },
+    Default = { "Apple", "Cherry" },
+    Multi = true,
+    Callback = function(value)
+        print("Selected fruits:", table.concat(value, ", "))
+    end,
+})
+
 local MainInfo = Tabs.Main:AddGroupbox("Info")
 MainInfo:AddLabel("Welcome to Valincia UI!")
 MainInfo:AddDivider()

@@ -1023,11 +1023,10 @@ function Groupbox:AddDropdown(flag, config)
     container.AutomaticSize = Enum.AutomaticSize.Y
     container.BackgroundTransparency = 1
     container.LayoutOrder = order
-    container.ClipsDescendants = false
     container.Parent = self._content
 
     local layout = Instance.new("UIListLayout")
-    layout.Padding = UDim.new(0, 2)
+    layout.Padding = UDim.new(0, 4)
     layout.SortOrder = Enum.SortOrder.LayoutOrder
     layout.Parent = container
 
@@ -1060,6 +1059,23 @@ function Groupbox:AddDropdown(flag, config)
     local btnPad = Instance.new("UIPadding", mainBtn)
     btnPad.PaddingLeft = UDim.new(0, 8)
 
+    -- Chevron Icon
+    local chevIcon = Library:GetIcon("chevron-down")
+    local chevImg = Instance.new("ImageLabel")
+    chevImg.Name = "Chevron"
+    chevImg.Size = UDim2.new(0, 16, 0, 16)
+    chevImg.Position = UDim2.new(1, -24, 0.5, -8)
+    chevImg.BackgroundTransparency = 1
+    chevImg.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    if chevIcon then
+        chevImg.Image = chevIcon.Url
+        chevImg.ImageRectOffset = chevIcon.ImageRectOffset
+        chevImg.ImageRectSize = chevIcon.ImageRectSize
+    else
+        chevImg.Image = "rbxassetid://6031091004"
+    end
+    chevImg.Parent = mainBtn
+
     local optFrame = Instance.new("Frame")
     optFrame.Size = UDim2.new(1, 0, 0, 0)
     optFrame.AutomaticSize = Enum.AutomaticSize.Y
@@ -1069,63 +1085,169 @@ function Groupbox:AddDropdown(flag, config)
     optFrame.LayoutOrder = 3
     optFrame.ClipsDescendants = true
     optFrame.Parent = container
+    
     Instance.new("UICorner", optFrame).CornerRadius = UDim.new(0, 4)
     local optStroke = Instance.new("UIStroke", optFrame)
     optStroke.Color = Color3.fromRGB(55, 55, 55); optStroke.Thickness = 1
-    local optLayout = Instance.new("UIListLayout", optFrame)
-    optLayout.Padding = UDim.new(0, 1); optLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    
+    local optList = Instance.new("UIListLayout", optFrame)
+    optList.Padding = UDim.new(0, 1)
+    optList.SortOrder = Enum.SortOrder.LayoutOrder
+
+    -- Search Bar
+    local searchBar = Instance.new("TextBox")
+    searchBar.Name = "Search"
+    searchBar.Size = UDim2.new(1, -8, 0, 24)
+    searchBar.Position = UDim2.new(0, 4, 0, 2)
+    searchBar.BackgroundTransparency = 1
+    searchBar.PlaceholderText = "Search..."
+    searchBar.Text = ""
+    searchBar.TextColor3 = Color3.fromRGB(200, 200, 200)
+    searchBar.TextSize = 12
+    searchBar.TextXAlignment = Enum.TextXAlignment.Left
+    searchBar.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
+    searchBar.LayoutOrder = 0
+    searchBar.Parent = optFrame
+    
+    local searchPad = Instance.new("UIPadding", searchBar)
+    searchPad.PaddingLeft = UDim.new(0, 4)
+    
+    local searchDiv = Instance.new("Frame")
+    searchDiv.Name = "Divider"
+    searchDiv.Size = UDim2.new(1, 0, 0, 1)
+    searchDiv.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    searchDiv.BorderSizePixel = 0
+    searchDiv.LayoutOrder = 1
+    searchDiv.Parent = optFrame
+
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Name = "Scroll"
+    scroll.Size = UDim2.new(1, 0, 0, 0) -- Height set dynamically
+    scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    scroll.BackgroundTransparency = 1
+    scroll.BorderSizePixel = 0
+    scroll.ScrollBarThickness = 2
+    scroll.LayoutOrder = 2
+    scroll.Parent = optFrame
+    
+    local scrollList = Instance.new("UIListLayout", scroll)
+    scrollList.Padding = UDim.new(0, 1)
+    scrollList.SortOrder = Enum.SortOrder.LayoutOrder
 
     local isOpen = false
 
     local function updateDisplay()
         local v = dropdown.Value
         if multi then
-            if type(v) == "table" and #v > 0 then mainBtn.Text = table.concat(v, ", ") else mainBtn.Text = "None" end
+            if type(v) == "table" and #v > 0 then 
+                mainBtn.Text = table.concat(v, ", ") 
+                mainBtn.TextColor3 = Color3.fromRGB(240, 240, 240)
+            else 
+                mainBtn.Text = "None"
+                mainBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+            end
         else
             mainBtn.Text = v and tostring(v) or "Select..."
+            mainBtn.TextColor3 = v and Color3.fromRGB(240, 240, 240) or Color3.fromRGB(180, 180, 180)
         end
     end
 
-    local function buildOptions()
-        for _, c in ipairs(optFrame:GetChildren()) do if c:IsA("TextButton") then c:Destroy() end end
+    local function buildOptions(filter)
+        for _, c in ipairs(scroll:GetChildren()) do 
+            if c:IsA("TextButton") then c:Destroy() end 
+        end
+        
+        local count = 0
         for i, opt in ipairs(dropdown.Options) do
+            local strOpt = tostring(opt)
+            if filter and filter ~= "" and not string.find(string.lower(strOpt), string.lower(filter)) then
+                continue
+            end
+            
+            count = count + 1
             local ob = Instance.new("TextButton")
             ob.Size = UDim2.new(1, 0, 0, 24)
             ob.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-            ob.BackgroundTransparency = 0.2
+            ob.BackgroundTransparency = 1
             ob.BorderSizePixel = 0
-            ob.Text = "  " .. tostring(opt)
+            ob.Text = "  " .. strOpt
             ob.TextColor3 = Color3.fromRGB(180, 180, 180)
             ob.TextSize = 11
             ob.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
             ob.TextXAlignment = Enum.TextXAlignment.Left
-            ob.LayoutOrder = i
             ob.AutoButtonColor = false
-            ob.Parent = optFrame
-            ob.MouseEnter:Connect(function() ob.BackgroundTransparency = 0; ob.BackgroundColor3 = Color3.fromRGB(50,50,50) end)
-            ob.MouseLeave:Connect(function() ob.BackgroundTransparency = 0.2; ob.BackgroundColor3 = Color3.fromRGB(35,35,35) end)
+            ob.Parent = scroll
+            
+            -- Highlight logic
+            local isSelected = false
+            if multi then
+                if type(dropdown.Value) == "table" and table.find(dropdown.Value, opt) then isSelected = true end
+            else
+                if dropdown.Value == opt then isSelected = true end
+            end
+            
+            if isSelected then
+                ob.TextColor3 = Color3.fromRGB(255, 255, 255)
+                ob.BackgroundTransparency = 0.8
+                ob.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+            end
+
             ob.MouseButton1Click:Connect(function()
                 if multi then
                     local idx = table.find(dropdown.Value, opt)
-                    if idx then table.remove(dropdown.Value, idx) else table.insert(dropdown.Value, opt) end
+                    if idx then 
+                        table.remove(dropdown.Value, idx)
+                    else 
+                        table.insert(dropdown.Value, opt) 
+                    end
+                    buildOptions(searchBar.Text) -- Refresh to show selection
                 else
                     dropdown.Value = opt
-                    isOpen = false; optFrame.Visible = false
+                    isOpen = false
+                    optFrame.Visible = false
+                    chevImg.Rotation = 0
                 end
                 updateDisplay()
                 dropdown.OnChanged:Fire(dropdown.Value)
                 if callback then Library:SafeCallback(callback, dropdown.Value) end
             end)
         end
+        
+        -- Resize scroll/frame
+        local itemHeight = 24
+        local totalHeight = math.min(count * (itemHeight + 1), 150) -- Max height 150px
+        scroll.Size = UDim2.new(1, 0, 0, totalHeight)
+        
+        -- Resize optFrame (Search(24) + Divider(1) + Scroll(totalHeight))
+        -- But optFrame is AutomaticSize.Y, usually works best if we enforce size for scroll
+        -- Actually, we can just set optFrame height manually if needed, or let auto handle it.
+        -- AutomaticSize works if children have size.
     end
 
+    searchBar:GetPropertyChangedSignal("Text"):Connect(function()
+        buildOptions(searchBar.Text)
+    end)
+
     mainBtn.MouseButton1Click:Connect(function()
-        isOpen = not isOpen; optFrame.Visible = isOpen
+        isOpen = not isOpen
+        optFrame.Visible = isOpen
+        chevImg.Rotation = isOpen and 180 or 0
+        if isOpen then
+            searchBar.Text = ""
+            buildOptions()
+        end
     end)
 
     function dropdown:SetValue(v) dropdown.Value = v; updateDisplay() end
     function dropdown:GetValue() return dropdown.Value end
     function dropdown:SetValues(list) dropdown.Options = list; buildOptions() end
+    function dropdown:Refresh(options, keepValue) 
+        dropdown.Options = options
+        if not keepValue then dropdown.Value = multi and {} or nil end
+        buildOptions()
+        updateDisplay()
+    end
 
     buildOptions()
     updateDisplay()
