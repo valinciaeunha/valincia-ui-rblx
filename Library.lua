@@ -317,14 +317,109 @@ function Library:CreateWindow(config)
     dividerLine.BorderSizePixel = 0
     dividerLine.Parent = main
 
+    -- Minimize Button (-)
+    local minBtn = Instance.new("TextButton")
+    minBtn.Name = "Minimize"
+    minBtn.Size = UDim2.new(0, 36, 1, 0)
+    minBtn.Position = UDim2.new(1, -72, 0, 0)
+    minBtn.BackgroundTransparency = 1
+    minBtn.Text = "-"
+    minBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+    minBtn.TextSize = 18
+    minBtn.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
+    minBtn.Parent = titleBar
+
+    minBtn.MouseEnter:Connect(function() minBtn.TextColor3 = Color3.fromRGB(200, 200, 200) end)
+    minBtn.MouseLeave:Connect(function() minBtn.TextColor3 = Color3.fromRGB(150, 150, 150) end)
+
+    -- Close Button (X)
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Name = "Close"
+    closeBtn.Size = UDim2.new(0, 36, 1, 0)
+    closeBtn.Position = UDim2.new(1, -36, 0, 0)
+    closeBtn.BackgroundTransparency = 1
+    closeBtn.Text = "X"
+    closeBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+    closeBtn.TextSize = 14
+    closeBtn.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
+    closeBtn.Parent = titleBar
+
+    closeBtn.MouseEnter:Connect(function() closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100) end)
+    closeBtn.MouseLeave:Connect(function() closeBtn.TextColor3 = Color3.fromRGB(150, 150, 150) end)
+
+    -- Floating Open Button (Right center of screen)
+    local openBtn = Instance.new("ImageButton")
+    openBtn.Name = "OpenButton"
+    openBtn.Size = UDim2.new(0, 50, 0, 50)
+    openBtn.Position = UDim2.new(1, -60, 0.5, -25)
+    openBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    openBtn.BackgroundTransparency = 0.2
+    openBtn.Visible = false
+    openBtn.Parent = screenGui
+    
+    local openCorner = Instance.new("UICorner")
+    openCorner.CornerRadius = UDim.new(1, 0)
+    openCorner.Parent = openBtn
+    
+    local openStroke = Instance.new("UIStroke")
+    openStroke.Color = Color3.fromRGB(60, 60, 60)
+    openStroke.Thickness = 1
+    openStroke.Parent = openBtn
+    
+    if config.OpenImageId then
+        openBtn.Image = "rbxassetid://" .. tostring(config.OpenImageId)
+    end
+    
+    -- Draggable Floating Button
+    local draggingOpen, dragStartOpen, startPosOpen
+    openBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            draggingOpen = true
+            dragStartOpen = input.Position
+            startPosOpen = openBtn.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if draggingOpen and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStartOpen
+            openBtn.Position = UDim2.new(startPosOpen.X.Scale, startPosOpen.X.Offset + delta.X, startPosOpen.Y.Scale, startPosOpen.Y.Offset + delta.Y)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            draggingOpen = false
+        end
+    end)
+
+    -- Toggle Logic
+    local function setVisible(vis)
+        main.Visible = vis
+        openBtn.Visible = not vis
+    end
+    
+    openBtn.MouseButton1Click:Connect(function()
+        setVisible(true)
+    end)
+    
+    minBtn.MouseButton1Click:Connect(function()
+        setVisible(false)
+    end)
+    
+    closeBtn.MouseButton1Click:Connect(function()
+        self:Unload()
+    end)
+
     -- Toggle keybind
     self.ToggleKeybind = toggleKey
     UserInputService.InputBegan:Connect(function(input, gpe)
         if gpe then return end
         if input.KeyCode == self.ToggleKeybind then
-            main.Visible = not main.Visible
+            setVisible(not main.Visible)
         end
     end)
+
+    -- Initial state
+    if not autoShow then setVisible(false) end
 
     local w = setmetatable({
         _library = self,

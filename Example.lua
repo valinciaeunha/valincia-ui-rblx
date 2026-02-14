@@ -18,6 +18,7 @@ local Window = Library:CreateWindow({
     Center = true,
     AutoShow = true,
     ToggleKeybind = Enum.KeyCode.RightControl,
+    OpenImageId = 139563907510631,
 })
 
 -- Create tabs
