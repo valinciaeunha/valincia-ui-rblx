@@ -337,7 +337,7 @@ function Library:CreateWindow(config)
     minBtn.Size = UDim2.new(0, 36, 1, 0)
     minBtn.Position = UDim2.new(1, -72, 0, 0)
     minBtn.BackgroundTransparency = 1
-    minBtn.Image = "rbxassetid://10656722881" -- Dash icon
+    minBtn.Image = "rbxassetid://6035047409" -- Material Remove (Minus)
     minBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
     minBtn.Parent = titleBar
 
@@ -350,7 +350,7 @@ function Library:CreateWindow(config)
     closeBtn.Size = UDim2.new(0, 36, 1, 0)
     closeBtn.Position = UDim2.new(1, -36, 0, 0)
     closeBtn.BackgroundTransparency = 1
-    closeBtn.Image = "rbxassetid://10656726569" -- Close X icon
+    closeBtn.Image = "rbxassetid://6031094670" -- Material Close (X)
     closeBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
     closeBtn.Parent = titleBar
 
