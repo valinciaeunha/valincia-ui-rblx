@@ -25,6 +25,7 @@ local Window = Library:CreateWindow({
     Center = true,
     AutoShow = true,
     ToggleKeybind = Enum.KeyCode.RightControl,
+    OpenImageId = 139563907510631,
     Icon = 139563907510631, -- Header Icon
 })
 

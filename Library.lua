@@ -465,8 +465,13 @@ function Library:CreateWindow(config)
     openStroke.Thickness = 1
     openStroke.Parent = openBtn
     
-    if config.OpenImageId then
-        openBtn.Image = "rbxassetid://" .. tostring(config.OpenImageId)
+    local openImageId = config.OpenImageId or config.Icon
+    if openImageId then
+        if type(openImageId) == "number" then
+            openBtn.Image = string.format("rbxassetid://%.0f", openImageId)
+        else
+            openBtn.Image = "rbxassetid://" .. tostring(openImageId)
+        end
     end
     
     -- Draggable Floating Button
