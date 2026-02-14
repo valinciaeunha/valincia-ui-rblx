@@ -259,15 +259,16 @@ function Library:CreateWindow(config)
 
     local footerLabel = Instance.new("TextLabel")
     footerLabel.Name = "Footer"
-    footerLabel.Size = UDim2.new(0, 100, 1, 0)
-    footerLabel.Position = UDim2.new(1, -112, 0, 0)
+    footerLabel.Size = UDim2.new(0, 120, 0, 20)
+    footerLabel.Position = UDim2.new(0, 8, 1, -24)
     footerLabel.BackgroundTransparency = 1
     footerLabel.Text = footer
-    footerLabel.TextColor3 = Color3.fromRGB(120, 120, 120)
+    footerLabel.TextColor3 = Color3.fromRGB(80, 80, 80)
     footerLabel.TextSize = 11
     footerLabel.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
-    footerLabel.TextXAlignment = Enum.TextXAlignment.Right
-    footerLabel.Parent = titleBar
+    footerLabel.TextXAlignment = Enum.TextXAlignment.Left
+    footerLabel.ZIndex = 5
+    footerLabel.Parent = main
 
     -- Drag logic
     local dragging, dragStart, startPos
@@ -331,34 +332,30 @@ function Library:CreateWindow(config)
     dividerLine.Parent = main
 
     -- Minimize Button (-)
-    local minBtn = Instance.new("TextButton")
+    local minBtn = Instance.new("ImageButton")
     minBtn.Name = "Minimize"
     minBtn.Size = UDim2.new(0, 36, 1, 0)
     minBtn.Position = UDim2.new(1, -72, 0, 0)
     minBtn.BackgroundTransparency = 1
-    minBtn.Text = "-"
-    minBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
-    minBtn.TextSize = 18
-    minBtn.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
+    minBtn.Image = "rbxassetid://10656722881" -- Dash icon
+    minBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
     minBtn.Parent = titleBar
 
-    minBtn.MouseEnter:Connect(function() minBtn.TextColor3 = Color3.fromRGB(200, 200, 200) end)
-    minBtn.MouseLeave:Connect(function() minBtn.TextColor3 = Color3.fromRGB(150, 150, 150) end)
+    self:Connect(minBtn.MouseEnter, function() minBtn.ImageColor3 = Color3.fromRGB(200, 200, 200) end)
+    self:Connect(minBtn.MouseLeave, function() minBtn.ImageColor3 = Color3.fromRGB(150, 150, 150) end)
 
     -- Close Button (X)
-    local closeBtn = Instance.new("TextButton")
+    local closeBtn = Instance.new("ImageButton")
     closeBtn.Name = "Close"
     closeBtn.Size = UDim2.new(0, 36, 1, 0)
     closeBtn.Position = UDim2.new(1, -36, 0, 0)
     closeBtn.BackgroundTransparency = 1
-    closeBtn.Text = "X"
-    closeBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
-    closeBtn.TextSize = 14
-    closeBtn.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json")
+    closeBtn.Image = "rbxassetid://10656726569" -- Close X icon
+    closeBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
     closeBtn.Parent = titleBar
 
-    closeBtn.MouseEnter:Connect(function() closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100) end)
-    closeBtn.MouseLeave:Connect(function() closeBtn.TextColor3 = Color3.fromRGB(150, 150, 150) end)
+    self:Connect(closeBtn.MouseEnter, function() closeBtn.ImageColor3 = Color3.fromRGB(255, 100, 100) end)
+    self:Connect(closeBtn.MouseLeave, function() closeBtn.ImageColor3 = Color3.fromRGB(150, 150, 150) end)
 
     -- Floating Open Button (Right center of screen)
     local openBtn = Instance.new("ImageButton")
