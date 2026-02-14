@@ -447,8 +447,9 @@ function Library:CreateWindow(config)
     end)
 
     -- Floating Open Button (Right center of screen)
-    local openBtn = Instance.new("ImageButton")
+    local openBtn = Instance.new("TextButton") -- Changed to TextButton to be container
     openBtn.Name = "OpenButton"
+    openBtn.Text = ""
     openBtn.Size = UDim2.new(0, 50, 0, 50)
     openBtn.Position = UDim2.new(1, -60, 0.5, -25)
     openBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -457,20 +458,28 @@ function Library:CreateWindow(config)
     openBtn.Parent = screenGui
     
     local openCorner = Instance.new("UICorner")
-    openCorner.CornerRadius = UDim.new(1, 0)
+    openCorner.CornerRadius = UDim.new(1, 0) -- Circle
     openCorner.Parent = openBtn
     
     local openStroke = Instance.new("UIStroke")
     openStroke.Color = Color3.fromRGB(60, 60, 60)
     openStroke.Thickness = 1
     openStroke.Parent = openBtn
+
+    local openIcon = Instance.new("ImageLabel")
+    openIcon.Name = "Icon"
+    openIcon.Size = UDim2.new(1, -16, 1, -16) -- 34x34 icon
+    openIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+    openIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+    openIcon.BackgroundTransparency = 1
+    openIcon.Parent = openBtn
     
     local openImageId = config.OpenImageId or config.Icon
     if openImageId then
         if type(openImageId) == "number" then
-            openBtn.Image = string.format("rbxassetid://%.0f", openImageId)
+            openIcon.Image = string.format("rbxassetid://%.0f", openImageId)
         else
-            openBtn.Image = "rbxassetid://" .. tostring(openImageId)
+            openIcon.Image = "rbxassetid://" .. tostring(openImageId)
         end
     end
     
