@@ -359,50 +359,76 @@ function Library:CreateWindow(config)
     dividerLine.Parent = main
 
     -- Minimize Button (-)
-    local minBtn = Instance.new("ImageButton")
+    local minBtn = Instance.new("TextButton")
     minBtn.Name = "Minimize"
     minBtn.Size = UDim2.new(0, 36, 1, 0)
     minBtn.Position = UDim2.new(1, -72, 0, 0)
     minBtn.BackgroundTransparency = 1
-    
-    local minIcon = Library:GetIcon("minus")
-    if minIcon then
-        minBtn.Image = minIcon.Url
-        minBtn.ImageRectOffset = minIcon.ImageRectOffset
-        minBtn.ImageRectSize = minIcon.ImageRectSize
-    else
-        minBtn.Image = "rbxassetid://9886659406" -- Fallback
-    end
-
-    minBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    minBtn.Text = ""
     minBtn.ZIndex = 11
     minBtn.Parent = titleBar
 
-    self:Connect(minBtn.MouseEnter, function() minBtn.ImageColor3 = Color3.fromRGB(200, 200, 200) end)
-    self:Connect(minBtn.MouseLeave, function() minBtn.ImageColor3 = Color3.fromRGB(150, 150, 150) end)
+    local minIconImg = Instance.new("ImageLabel")
+    minIconImg.Name = "Icon"
+    minIconImg.Size = UDim2.new(0, 24, 0, 24)
+    minIconImg.AnchorPoint = Vector2.new(0.5, 0.5)
+    minIconImg.Position = UDim2.new(0.5, 0, 0.5, 0)
+    minIconImg.BackgroundTransparency = 1
+    minIconImg.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    minIconImg.ZIndex = 12
+    minIconImg.Parent = minBtn
+
+    local minIcon = Library:GetIcon("minus")
+    if minIcon then
+        minIconImg.Image = minIcon.Url
+        minIconImg.ImageRectOffset = minIcon.ImageRectOffset
+        minIconImg.ImageRectSize = minIcon.ImageRectSize
+    else
+        minIconImg.Image = "rbxassetid://9886659406"
+    end
+
+    self:Connect(minBtn.MouseEnter, function() minIconImg.ImageColor3 = Color3.fromRGB(200, 200, 200) end)
+    self:Connect(minBtn.MouseLeave, function() minIconImg.ImageColor3 = Color3.fromRGB(150, 150, 150) end)
 
     -- Close Button (X)
-    local closeBtn = Instance.new("ImageButton")
+    local closeBtn = Instance.new("TextButton")
     closeBtn.Name = "Close"
     closeBtn.Size = UDim2.new(0, 36, 1, 0)
     closeBtn.Position = UDim2.new(1, -36, 0, 0)
     closeBtn.BackgroundTransparency = 1
-
-    local closeIcon = Library:GetIcon("x")
-    if closeIcon then
-        closeBtn.Image = closeIcon.Url
-        closeBtn.ImageRectOffset = closeIcon.ImageRectOffset
-        closeBtn.ImageRectSize = closeIcon.ImageRectSize
-    else
-        closeBtn.Image = "rbxassetid://9886659671" -- Fallback
-    end
-
-    closeBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    closeBtn.Text = ""
     closeBtn.ZIndex = 11
     closeBtn.Parent = titleBar
 
-    self:Connect(closeBtn.MouseEnter, function() closeBtn.ImageColor3 = Color3.fromRGB(255, 100, 100) end)
-    self:Connect(closeBtn.MouseLeave, function() closeBtn.ImageColor3 = Color3.fromRGB(150, 150, 150) end)
+    local closeIconImg = Instance.new("ImageLabel")
+    closeIconImg.Name = "Icon"
+    closeIconImg.Size = UDim2.new(0, 24, 0, 24)
+    closeIconImg.AnchorPoint = Vector2.new(0.5, 0.5)
+    closeIconImg.Position = UDim2.new(0.5, 0, 0.5, 0)
+    closeIconImg.BackgroundTransparency = 1
+    closeIconImg.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    closeIconImg.ZIndex = 12
+    closeIconImg.Parent = closeBtn
+
+    local closeIcon = Library:GetIcon("x")
+    if closeIcon then
+        closeIconImg.Image = closeIcon.Url
+        closeIconImg.ImageRectOffset = closeIcon.ImageRectOffset
+        closeIconImg.ImageRectSize = closeIcon.ImageRectSize
+    else
+        closeIconImg.Image = "rbxassetid://9886659671"
+    end
+
+    self:Connect(closeBtn.MouseEnter, function() closeIconImg.ImageColor3 = Color3.fromRGB(255, 80, 80) end)
+    self:Connect(closeBtn.MouseLeave, function() closeIconImg.ImageColor3 = Color3.fromRGB(150, 150, 150) end)
+
+    minBtn.MouseButton1Click:Connect(function()
+        Window:Toggle(false)
+    end)
+
+    closeBtn.MouseButton1Click:Connect(function()
+        Library:Unload()
+    end)
 
     -- Floating Open Button (Right center of screen)
     local openBtn = Instance.new("ImageButton")
