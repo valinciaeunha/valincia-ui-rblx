@@ -524,12 +524,20 @@ function Library:CreateWindow(config)
     end)
 
     -- Resize Handle (Bottom Right)
+    -- Resize Handle (Bottom Right)
+    local resizeIcon = self:GetIcon("maximize-2")
     local resizeHandle = Instance.new("ImageButton")
     resizeHandle.Name = "ResizeHandle"
     resizeHandle.Size = UDim2.new(0, 16, 0, 16)
     resizeHandle.Position = UDim2.new(1, -16, 1, -16)
     resizeHandle.BackgroundTransparency = 1
-    resizeHandle.Image = "rbxassetid://10656726569" -- Resize corner icon
+    if resizeIcon then
+        resizeHandle.Image = resizeIcon.Url
+        resizeHandle.ImageRectOffset = resizeIcon.ImageRectOffset
+        resizeHandle.ImageRectSize = resizeIcon.ImageRectSize
+    else
+        resizeHandle.Image = "rbxassetid://6031097225" -- Fallback
+    end
     resizeHandle.ImageColor3 = Color3.fromRGB(150, 150, 150)
     resizeHandle.ImageTransparency = 0.5
     resizeHandle.Parent = main
@@ -766,6 +774,7 @@ function Groupbox.new(contentFrame, title, library)
 end
 
 function Groupbox:_nextOrder()
+    if not self._order then self._order = 0 end
     self._order = self._order + 1
     return self._order
 end
