@@ -272,10 +272,26 @@ function Library:CreateWindow(config)
     tbFix.BorderSizePixel = 0
     tbFix.Parent = titleBar
 
+    -- Header Icon
+    local headerIconId = config.Icon
+    local titlePositionX = 12
+
+    if headerIconId then
+        local headerIcon = Instance.new("ImageLabel")
+        headerIcon.Name = "HeaderIcon"
+        headerIcon.Size = UDim2.new(0, 20, 0, 20)
+        headerIcon.Position = UDim2.new(0, 8, 0, 8)
+        headerIcon.BackgroundTransparency = 1
+        headerIcon.Image = "rbxassetid://" .. tostring(headerIconId)
+        headerIcon.Parent = titleBar
+        
+        titlePositionX = 36 -- Shift title to the right
+    end
+
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Name = "Title"
-    titleLabel.Size = UDim2.new(1, -16, 1, 0)
-    titleLabel.Position = UDim2.new(0, 12, 0, 0)
+    titleLabel.Size = UDim2.new(1, -16 - titlePositionX, 1, 0)
+    titleLabel.Position = UDim2.new(0, titlePositionX, 0, 0)
     titleLabel.BackgroundTransparency = 1
     titleLabel.Text = title
     titleLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
@@ -370,7 +386,7 @@ function Library:CreateWindow(config)
 
     local minIconImg = Instance.new("ImageLabel")
     minIconImg.Name = "Icon"
-    minIconImg.Size = UDim2.new(0, 24, 0, 24)
+    minIconImg.Size = UDim2.new(0, 20, 0, 20)
     minIconImg.AnchorPoint = Vector2.new(0.5, 0.5)
     minIconImg.Position = UDim2.new(0.5, 0, 0.5, 0)
     minIconImg.BackgroundTransparency = 1
@@ -402,7 +418,7 @@ function Library:CreateWindow(config)
 
     local closeIconImg = Instance.new("ImageLabel")
     closeIconImg.Name = "Icon"
-    closeIconImg.Size = UDim2.new(0, 24, 0, 24)
+    closeIconImg.Size = UDim2.new(0, 20, 0, 20)
     closeIconImg.AnchorPoint = Vector2.new(0.5, 0.5)
     closeIconImg.Position = UDim2.new(0.5, 0, 0.5, 0)
     closeIconImg.BackgroundTransparency = 1
