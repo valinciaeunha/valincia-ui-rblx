@@ -1057,7 +1057,7 @@ function Groupbox:AddDropdown(flag, config)
     -- Value Display Label (Truncates correctly)
     local valLabel = Instance.new("TextLabel")
     valLabel.Name = "Value"
-    valLabel.Size = UDim2.new(1, -32, 1, 0) -- Leave room for chevron
+    valLabel.Size = UDim2.new(1, -44, 1, 0) -- Leave room for chevron (was -32)
     valLabel.Position = UDim2.new(0, 8, 0, 0)
     valLabel.BackgroundTransparency = 1
     valLabel.Text = ""
