@@ -38,13 +38,12 @@ local CONFIG = {
     --   1. JSON API:   Returns {"valid": true/false, "message": "..."}
     --   2. Key List:   Plain text with one valid key per line
     --   3. Leave empty ("") to use only local VALID_KEYS below
-    API_URL = "https://file.vinzhub.com/f/Uka1zW",
+    API_URL = "https://file.vinzhub.com/f/vChQGN",
 
     -- Hardcoded valid keys (always checked first, before API)
     -- Leave empty {} if you only want API validation
     VALID_KEYS = {
         "VALINCIA-XXXX-YYYY-ZZZZ",
-        "TEST-KEY-1234",
     },
 
     -- Link where users can obtain a key

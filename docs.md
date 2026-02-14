@@ -1,17 +1,39 @@
-# Valincia UI Library
+# Valincia UI -- API Documentation
 
-A modern, single-file loadstring-compatible UI library for Roblox executors. Features a dark theme, smooth animations, sidebar navigation, and a full set of interactive elements.
+Complete reference for all UI elements, addons, and features.
+
+For project overview and quick start, see [README.md](README.md).
 
 ---
 
-## Quick Start
+## Table of Contents
 
-```lua
-local repo = "https://raw.githubusercontent.com/valinciaeunha/valincia-ui-rblx/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-```
+- [Creating a Window](#creating-a-window)
+- [Tabs](#tabs)
+- [Groupbox](#groupbox)
+- [Elements](#elements)
+  - [Toggle](#toggle)
+  - [Slider](#slider)
+  - [Dropdown](#dropdown)
+  - [Input](#input-text-field)
+  - [Keybind](#keybind)
+  - [Button](#button)
+  - [Button Row](#button-row)
+  - [Label](#label)
+  - [Divider](#divider)
+  - [ColorPicker](#colorpicker)
+  - [Checkbox](#checkbox)
+  - [Image](#image)
+  - [Video](#video)
+  - [Viewport](#viewport-3d-model)
+- [Dependency](#dependency)
+- [Tabbox](#tabbox-nested-tabs)
+- [Notifications](#notifications)
+- [Addons](#addons)
+  - [SaveManager](#savemanager)
+  - [ThemeManager](#thememanager)
+- [Key System](#key-system)
+- [Unload / Cleanup](#unload--cleanup)
 
 ---
 
@@ -143,7 +165,7 @@ MyGroup:AddDropdown("FruitsFlag", {
 | `dropdown:SetValue(val)` | Set selected value |
 | `dropdown:GetValue()` | Get current value |
 | `dropdown:SetValues(list)` | Replace options list |
-| `dropdown:Refresh(options, keepValue?)` | Replace options and optionally reset selection |
+| `dropdown:Refresh(options, keepValue?)` | Replace options and optionally reset |
 
 ### Input (Text Field)
 
@@ -367,6 +389,9 @@ ThemeManager:SaveCustomTheme("MyTheme", data)    -- save a custom theme
 ThemeManager:LoadDefault()                       -- reset to Dark theme
 ```
 
+**Theme color keys:**
+`Background`, `Surface`, `SurfaceAlt`, `Accent`, `Text`, `TextDimmed`, `Border`, `Divider`, `Toggle_On`, `Toggle_Off`, `Slider_Fill`, `Slider_Track`, `Checkbox_Check`, `Dropdown_Bg`
+
 ---
 
 ## Key System
@@ -374,26 +399,31 @@ ThemeManager:LoadDefault()                       -- reset to Dark theme
 Built-in key validation with **auto-save** and **configurable expiry**. See `KeySystemExample.lua` for the full implementation.
 
 **Supported key source formats:**
-| Format | Example |
-|--------|---------|
-| Local hardcoded | `VALID_KEYS = { "KEY-1234" }` |
-| JSON API | `{"valid": true, "message": "OK"}` |
-| JSON array | `["KEY-1234", "KEY-5678"]` |
-| Plain text (one per line) | `KEY-1234\nKEY-5678` |
+| Format | Description | Example |
+|--------|-------------|---------|
+| Local hardcoded | Keys defined directly in script | `VALID_KEYS = { "KEY-1234" }` |
+| JSON API | Server returns validation result | `{"valid": true, "message": "OK"}` |
+| JSON array | Server returns list of valid keys | `["KEY-1234", "KEY-5678"]` |
+| Plain text | One valid key per line | `KEY-1234\nKEY-5678` |
 
 ```lua
 local CONFIG = {
-    API_URL = "https://your-api.com/keys.txt",   -- or JSON endpoint
-    VALID_KEYS = { "TEST-KEY-1234" },            -- local fallback
-    EXPIRY_HOURS = 24,                           -- auto-save duration
+    API_URL = "https://your-api.com/keys.txt",   -- any format above
+    VALID_KEYS = { "TEST-KEY-1234" },            -- local fallback (checked first)
+    EXPIRY_HOURS = 24,                           -- how long a validated key stays valid
 }
 ```
 
-**Flow:**
-1. On startup, check locally saved key
-2. If saved key exists and not expired, validate and auto-load main script
-3. If no saved key or expired, show key system UI
-4. After successful validation, key is saved locally with timestamp
+**Validation flow:**
+1. Check local hardcoded `VALID_KEYS` first (instant, no network)
+2. If no match, fetch from `API_URL` and auto-detect format
+3. All comparisons are **case-insensitive**
+
+**Auto-save flow:**
+1. On startup, check locally saved key file
+2. If saved key exists and not expired, validate and auto-load script
+3. If expired or no saved key, show key system UI
+4. After successful validation, key + timestamp saved locally
 
 ---
 
@@ -412,47 +442,3 @@ if getgenv().MyScript then
 end
 getgenv().MyScript = Library
 ```
-
----
-
-## Full Example
-
-```lua
-local repo = "https://raw.githubusercontent.com/valinciaeunha/valincia-ui-rblx/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-
-local Window = Library:CreateWindow({
-    Title = "My Script",
-    Footer = "v1.0.0",
-    Center = true,
-    AutoShow = true,
-})
-
-local Tabs = {
-    Main = Window:AddTab("Main"),
-    Settings = Window:AddTab("Settings"),
-}
-
-local MainGroup = Tabs.Main:AddGroupbox("Features")
-MainGroup:AddToggle("AutoFarm", { Text = "Auto Farm", Default = false })
-MainGroup:AddSlider("Speed", { Text = "Speed", Default = 16, Min = 0, Max = 200, Rounding = 0 })
-MainGroup:AddDropdown("Mode", { Text = "Mode", Values = {"A", "B", "C"}, Default = "A" })
-
-SaveManager:SetLibrary(Library)
-SaveManager:SetFolder("MyScript")
-SaveManager:BuildConfigSection(Tabs.Settings)
-
-ThemeManager:SetLibrary(Library)
-ThemeManager:SetFolder("MyScript")
-ThemeManager:ApplyToTab(Tabs.Settings)
-
-SaveManager:LoadAutoloadConfig()
-```
-
----
-
-## License
-
-Valincia UI is open source. Feel free to use and modify.
