@@ -812,7 +812,7 @@ function Groupbox:AddToggle(flag, config)
     local track = Instance.new("Frame")
     track.Size = UDim2.new(0, 36, 0, 18)
     track.Position = UDim2.new(1, -40, 0.5, -9)
-    track.BackgroundColor3 = default and Color3.fromRGB(96, 200, 130) or Color3.fromRGB(70, 70, 70)
+    track.BackgroundColor3 = default and Color3.fromRGB(0, 122, 255) or Color3.fromRGB(50, 50, 50) -- Blue / Dark Grey
     track.BorderSizePixel = 0
     track.Parent = container
 
@@ -821,14 +821,16 @@ function Groupbox:AddToggle(flag, config)
     local knob = Instance.new("Frame")
     knob.Size = UDim2.new(0, 14, 0, 14)
     knob.Position = default and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
-    knob.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+    knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     knob.BorderSizePixel = 0
     knob.Parent = track
     Instance.new("UICorner", knob).CornerRadius = UDim.new(1, 0)
 
     local function updateVisual(val, animate)
-        local targetTrack = val and Color3.fromRGB(96, 200, 130) or Color3.fromRGB(70, 70, 70)
+        -- High contrast colors: Bright Blue for ON, Dark Grey for OFF
+        local targetTrack = val and Color3.fromRGB(0, 122, 255) or Color3.fromRGB(50, 50, 50)
         local targetKnob = val and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
+        
         if animate then
             TweenService:Create(track, TWEEN_FAST, { BackgroundColor3 = targetTrack }):Play()
             TweenService:Create(knob, TWEEN_FAST, { Position = targetKnob }):Play()
