@@ -337,7 +337,7 @@ function Library:CreateWindow(config)
     minBtn.Size = UDim2.new(0, 36, 1, 0)
     minBtn.Position = UDim2.new(1, -72, 0, 0)
     minBtn.BackgroundTransparency = 1
-    minBtn.Image = "rbxassetid://8422725545" -- Lucide-like Minus
+    minBtn.Image = "rbxassetid://9886659406" -- Lucide Minus
     minBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
     minBtn.ZIndex = 11
     minBtn.Parent = titleBar
@@ -351,7 +351,7 @@ function Library:CreateWindow(config)
     closeBtn.Size = UDim2.new(0, 36, 1, 0)
     closeBtn.Position = UDim2.new(1, -36, 0, 0)
     closeBtn.BackgroundTransparency = 1
-    closeBtn.Image = "rbxassetid://8422725962" -- Lucide-like X
+    closeBtn.Image = "rbxassetid://9886659671" -- Lucide Close
     closeBtn.ImageColor3 = Color3.fromRGB(150, 150, 150)
     closeBtn.ZIndex = 11
     closeBtn.Parent = titleBar
