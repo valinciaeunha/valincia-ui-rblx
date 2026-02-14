@@ -13,6 +13,9 @@ local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
+-- Forward declarations (must be local to avoid global pollution)
+local Tab, Groupbox, Tabbox
+
 --------------------------------------------------------------------------------
 --// Icon Module \\--
 type Icon = {
@@ -628,6 +631,7 @@ end
 --------------------------------------------------------------------------------
 Tab = {}
 Tab.__index = Tab
+-- (forward-declared as local at top of file)
 
 function Tab.new(window, name, icon)
     local self = setmetatable({}, Tab)
@@ -708,6 +712,7 @@ function Tab:AddRightTabbox(title) return self:AddTabbox(title) end
 --------------------------------------------------------------------------------
 Groupbox = {}
 Groupbox.__index = Groupbox
+-- (forward-declared as local at top of file)
 
 function Groupbox.new(contentFrame, title, library)
     local self = setmetatable({}, Groupbox)
@@ -1753,6 +1758,7 @@ end
 --------------------------------------------------------------------------------
 Tabbox = {}
 Tabbox.__index = Tabbox
+-- (forward-declared as local at top of file)
 
 function Tabbox.new(parent, title, library)
     local self = setmetatable({}, Tabbox)

@@ -65,7 +65,7 @@ KeyGroup:AddDivider()
 
 KeyGroup:AddButtonRow({
     {
-        Text = "🔑 Get Key",
+        Text = "Get Key",
         Callback = function()
             -- Open the key link
             if setclipboard then
@@ -83,7 +83,7 @@ KeyGroup:AddButtonRow({
         end,
     },
     {
-        Text = "✅ Validate",
+        Text = "Validate",
         Callback = function()
             local keyInput = Library.Options["KeyInput"]
             if not keyInput then return end
